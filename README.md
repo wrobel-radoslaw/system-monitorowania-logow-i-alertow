@@ -8,18 +8,18 @@ Budujemy demonstracyjny system, który zbiera syntetyczne zdarzenia z co najmnie
 
 ## Role
 
-- **Radosław — PM + DevOps/QA:** koordynacja pracy, generator zdarzeń, środowisko uruchomieniowe, testy i automatyzacja w przypisanych zadaniach.
-- **Viktoriia — Frontend:** dashboard, filtry, szczegóły zdarzeń oraz widoki statusów i alertów.
-- **Natalia — Backend:** model danych, REST API, trwały zapis i reguły alertów.
+- **Radosław - PM + DevOps/QA:** koordynacja pracy, generator zdarzeń, środowisko uruchomieniowe, testy i automatyzacja w przypisanych zadaniach.
+- **Viktoriia - Frontend:** dashboard, filtry, szczegóły zdarzeń oraz widoki statusów i alertów.
+- **Natalia - Backend:** model danych, REST API, trwały zapis i reguły alertów.
 
 Szczegóły realizacji wynikają z kart Trello. Zmiany podziału zakresu należy uzgodnić w zespole przed rozpoczęciem implementacji.
 
 ## Harmonogram
 
-- **Prezentacja planu — 21.10.2026:** zadanie organizacyjne na liście `Kalendarz`; nie jest osobnym milestone'em.
-- **M1 — 21.10–04.11.2026:** szkielet i podstawowa architektura.
-- **M2 — 04.11–18.11.2026:** zbieranie i przegląd zdarzeń oraz obsługa alertów.
-- **M3 — 18.11–02.12.2026:** jakość, stabilizacja i wydanie.
+- **Prezentacja planu - 21.10.2026:** zadanie organizacyjne na liście `Kalendarz`; nie jest osobnym milestone'em.
+- **M1 - 21.10–04.11.2026:** szkielet i podstawowa architektura.
+- **M2 - 04.11–18.11.2026:** zbieranie i przegląd zdarzeń oraz obsługa alertów.
+- **M3 - 18.11–02.12.2026:** jakość, stabilizacja i wydanie.
 
 ## Stan repozytorium
 
