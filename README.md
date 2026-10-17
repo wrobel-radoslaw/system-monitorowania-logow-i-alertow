@@ -16,14 +16,9 @@ Szczegóły realizacji wynikają z kart Trello. Zmiany podziału zakresu należy
 
 ## Harmonogram
 
-- **Prezentacja planu - 21.10.2026:** zadanie organizacyjne na liście `Kalendarz`; nie jest osobnym milestone'em.
 - **M1 - 21.10–04.11.2026:** szkielet i podstawowa architektura.
 - **M2 - 04.11–18.11.2026:** zbieranie i przegląd zdarzeń oraz obsługa alertów.
 - **M3 - 18.11–02.12.2026:** jakość, stabilizacja i wydanie.
-
-## Stan repozytorium
-
-Repozytorium zawiera konfigurację edytora i Gita, dokumentację startową oraz puste katalogi przeznaczone na przyszłe komponenty. Nie oznacza to, że implementacja tych komponentów już istnieje. Kod aplikacji, kontrakt API, generator, konfiguracja uruchomieniowa i testy będą dodawane w ramach odpowiednich kart Trello.
 
 ## Struktura
 
@@ -31,24 +26,17 @@ Repozytorium zawiera konfigurację edytora i Gita, dokumentację startową oraz 
 .
 ├── .github/
 │   └── PULL_REQUEST_TEMPLATE.md
-├── backend/                 # Kod backendu dodawany w zadaniach
+├── backend/
 ├── docs/
 │   ├── PROJECT_OVERVIEW.md
 │   └── REPOSITORY_SETUP.md
-├── frontend/                # Kod frontendu dodawany w zadaniach
-├── tests/                   # Testy dodawane w przypisanych zadaniach
+├── frontend/
+├── tests/
 ├── tools/
-│   ├── event-generator/     # Generator dodawany w odpowiednim zadaniu
-│   └── webhook-stub/        # Odbiornik testowy dodawany w odpowiednim zadaniu
+│   ├── event-generator/
+│   └── webhook-stub/
 ├── .editorconfig
 ├── .gitattributes
 ├── .gitignore
 ├── CONTRIBUTING.md
 └── README.md
-```
-
-## Pierwsze kroki
-
-1. Przeczytaj `docs/PROJECT_OVERVIEW.md` i `docs/REPOSITORY_SETUP.md`.
-2. Zapoznaj się z `CONTRIBUTING.md`.
-3. Wybierz przypisaną kartę Trello i pracuj w zakresie jej kryteriów akceptacji (AC).
