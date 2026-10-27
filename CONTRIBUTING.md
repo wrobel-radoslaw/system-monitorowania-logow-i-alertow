@@ -1,41 +1,32 @@
 # Zasady współpracy
 
-Krótki opis wspólnego workflow w trzyosobowym zespole. Zasady mają ułatwiać integrację prac, nie tworzyć dodatkowej biurokracji.
+Każda zmiana powinna dotyczyć jednej karty Trello i jej kryteriów akceptacji. Nie zmieniaj wspólnego kontraktu ani zakresu innej osoby bez uzgodnienia.
 
-## Podstawowe reguły
+## Branch, PR, review
 
-1. Każda zmiana realizuje zakres konkretnej karty Trello i jej kryteria akceptacji (AC).
-2. Nie rozszerzamy samodzielnie zakresu zadania ani nie zmieniamy wspólnego kontraktu bez uzgodnienia z osobami, których to dotyczy.
-3. Nie umieszczamy w repozytorium haseł, tokenów, kluczy, prywatnych danych ani lokalnych plików `.env`.
-4. Nie scalaj zmian bezpośrednio do `main`. Przekazuj je przez Pull Request, aby druga osoba mogła sprawdzić zakres i rezultat.
-5. Jeśli zmiana wpływa na sposób uruchamiania, kontrakt albo zachowanie widoczne dla innych modułów, zaktualizuj właściwą dokumentację.
+1. Utwórz gałąź od aktualnego `main`, np. `feat/nazwa`, `fix/nazwa`, `test/nazwa` albo `chore/nazwa`.
+2. Zrób małe commity i wypchnij gałąź.
+3. Otwórz Pull Request do `main`. Opisz kartę, zakres i wykonane testy.
+4. Poproś o review innej osoby. Nie scalaj zmian bezpośrednio do `main`.
 
-## Gałęzie i commity
+Ochrona `main` wymaga ustawienia w GitHubie i nie jest weryfikowana przez lokalne testy. Włącz wymagany Pull Request, co najmniej jedno zatwierdzenie oraz kontrole `ci / components`, `ci / compose` i `ci / generator`. GitHub może pokazywać nazwę workflow przed nazwą joba, więc wybierz kontrole odpowiadające tym jobom. Joby `frontend` i `backend` pozostaw niewymagane, dopóki ich kod nie istnieje; wtedy są rzeczywiście pomijane, a nie zaliczane jako wykonane buildy. Po dodaniu kodu uruchom CI i dodaj odpowiednie kontrole do ochrony gałęzi.
 
-Twórz krótką gałąź dla jednego zadania, zaczynając od aktualnego `main`. Stosuj czytelne prefiksy, np.:
+## Przed PR
 
-- `feat/` — nowa funkcja,
-- `fix/` — poprawka błędu,
-- `docs/` — dokumentacja,
-- `test/` — testy,
-- `chore/` — konfiguracja i prace pomocnicze.
+Dla generatora i higieny repozytorium:
 
-Przykładowe commity:
-
-```text
-docs: opisz strukturę repozytorium
-feat: dodaj filtrowanie zdarzeń
-fix: popraw walidację statusu
+```powershell
+python -m unittest discover -s tests -v
 ```
 
-Commit powinien dotyczyć jednej logicznej zmiany. Przed zatwierdzeniem sprawdź `git status` oraz `git diff`.
+Dla konfiguracji Compose po przygotowaniu `.env`:
 
-## Pull Request i przegląd
+```powershell
+docker compose config --quiet
+```
 
-W opisie PR podaj kartę Trello, krótki zakres zmian, sposób weryfikacji i stan AC. Nie wpisuj testów, których faktycznie nie uruchomiono. Poproś o przegląd inną osobę z zespołu przed scaleniem. Jeżeli przegląd wykryje problem, popraw go w tej samej gałęzi.
+W opisie PR podaj rzeczywiste wyniki. Nie oznaczaj pominiętego builda jako zaliczonego. Sprawdź `git diff` i `git status` przed commitem.
 
-Po scaleniu zaktualizuj lokalny `main` przed rozpoczęciem kolejnej pracy. Jeżeli zadanie jest zablokowane przez brak rezultatu z innego obszaru, opisz blokadę w karcie Trello i skontaktuj się z właścicielem zależności.
+## Konfiguracja lokalna
 
-## Zakres
-
-Nie dodawaj do zadania funkcji, plików ani infrastruktury, których nie wymagają jego AC. Jeżeli potrzebna zmiana wykracza poza kartę, uzgodnij ją i popraw plan przed implementacją.
+Nie commituj `.env`, haseł, tokenów ani kluczy. Użyj `.env.example` jako wzoru. Zmienne testowe w CI nie są sekretami produkcyjnymi. Nie wpisuj rzeczywistych danych uwierzytelniających w plikach repozytorium ani logach.

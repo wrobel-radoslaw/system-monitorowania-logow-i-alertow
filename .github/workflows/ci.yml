@@ -1,0 +1,117 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  components:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.detect.outputs.frontend }}
+      backend: ${{ steps.detect.outputs.backend }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Detect application components
+        id: detect
+        shell: bash
+        run: |
+          if [ -f frontend/package.json ]; then
+            if [ ! -f frontend/package-lock.json ]; then
+              echo "::error::frontend/package-lock.json is required for npm ci"
+              exit 1
+            fi
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+          elif find frontend -type f -name package.json -not -path '*/node_modules/*' -print -quit | grep -q .; then
+            echo "::error::package.json must be in frontend/"
+            exit 1
+          else
+            echo "frontend=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=frontend SKIPPED::frontend source is not present; build was not run"
+            echo "### frontend: SKIPPED (source not present; build not run)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if find backend -type f \( -name '*.sln' -o -name '*.slnx' -o -name '*.csproj' \) -print -quit | grep -q .; then
+            echo "backend=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "backend=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=backend SKIPPED::backend project is not present; build was not run"
+            echo "### backend: SKIPPED (source not present; build not run)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  compose:
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_PASSWORD: ci-validation-only
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: docker compose config --quiet
+
+  generator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s tests -v
+
+  frontend:
+    needs: components
+    if: needs.components.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - working-directory: frontend
+        run: npm ci
+      - working-directory: frontend
+        run: npm run build
+
+  backend:
+    needs: components
+    if: needs.components.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8d9a1da68b02621f # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - name: Build backend
+        shell: bash
+        run: |
+          mapfile -t solutions < <(find backend -type f \( -name '*.slnx' -o -name '*.sln' \) | sort)
+          mapfile -t projects < <(find backend -type f -name '*.csproj' | sort)
+          if [ "${#solutions[@]}" -gt 1 ]; then
+            echo "More than one solution found in backend/. Choose one solution to build." >&2
+            exit 1
+          elif [ "${#solutions[@]}" -eq 1 ]; then
+            dotnet build "${solutions[0]}" -c Release
+          elif [ "${#projects[@]}" -gt 0 ]; then
+            for project in "${projects[@]}"; do
+              dotnet build "$project" -c Release || exit $?
+            done
+          else
+            echo "No .NET project found in backend/." >&2
+            exit 1
+          fi

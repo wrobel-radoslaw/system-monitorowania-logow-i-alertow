@@ -58,4 +58,4 @@ Nazwij gałąź zgodnie z zasadami w `CONTRIBUTING.md`. Po zakończeniu sprawdź
 
 ## Katalogi komponentów
 
-`backend/`, `frontend/`, `tools/event-generator/`, `tools/webhook-stub/` i `tests/` są obecnie pustymi katalogami z plikami `.gitkeep`. Zawartość zostanie dodana w ramach przypisanych kart. Nie oznacza to istnienia kodu ani gotowego środowiska uruchomieniowego.
+`backend/`, `frontend/` i `tools/webhook-stub/` zawierają na tym etapie tylko `.gitkeep`. `tools/event-generator/` i `tests/` zawierają generator offline oraz testy M1. Compose uruchamia obecnie wyłącznie PostgreSQL; serwisy API i frontend dodaje się po dostarczeniu rzeczywistego kodu i Dockerfile. Puste katalogi nie oznaczają gotowego środowiska aplikacji.
