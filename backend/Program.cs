@@ -5,7 +5,21 @@ using Npgsql;
 using backend.Models;
 using backend.DTOs;
 
+var allowedSeverities = new[]
+{
+    "INFO", "WARN", "ERROR", "CRITICAL"
+};
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(
+        new System.Text.Json.Serialization.JsonStringEnumConverter(
+            allowIntegerValues: false
+        )
+    );
+});
 
 //konfiguracja bazy danych
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -92,6 +106,15 @@ app.MapPost("/api/events", async (
         });
     }
 
+    // Walidacja severity
+    if (!allowedSeverities.Contains(request.Severity))
+    {
+        return Results.BadRequest(new
+        {
+            error = "Nieprawidłowy severity. Dozwolone wartości: INFO, WARN, ERROR, CRITICAL."
+        });
+    }
+
     // Walidacja identyfikatora
     if (request.EventId != null &&
         string.IsNullOrWhiteSpace(request.EventId))
@@ -103,23 +126,24 @@ app.MapPost("/api/events", async (
     }
 
     // Walidacja formatu daty zgodnego z generatorem
-    bool validTimestamp = DateTime.TryParseExact(
+    bool validTimestamp = DateTimeOffset.TryParse(
         request.Timestamp,
-        "yyyy-MM-dd'T'HH:mm:ss'Z'",
         CultureInfo.InvariantCulture,
-        DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
-        out var timestamp
+        DateTimeStyles.None,
+        out var parsedTimestamp
     );
 
-    if (!validTimestamp)
+    if (!validTimestamp ||
+        parsedTimestamp.Offset == TimeSpan.Zero &&
+        !request.Timestamp.EndsWith("Z", StringComparison.OrdinalIgnoreCase))
     {
         return Results.BadRequest(new
         {
-            error = "Nieprawidłowy format timestamp. Oczekiwany format: yyyy-MM-ddTHH:mm:ssZ."
+            error = "Nieprawidłowy format timestamp. Oczekiwany ISO 8601 ze strefą czasową."
         });
     }
 
-    timestamp = DateTime.SpecifyKind(timestamp, DateTimeKind.Utc);
+    DateTime timestamp = parsedTimestamp.UtcDateTime;
 
     // Generowanie identyfikatora, jeśli nie został podany
     string eventId = request.EventId ?? Guid.NewGuid().ToString("D");
@@ -173,6 +197,132 @@ app.MapPost("/api/events", async (
     .Produces<EventDto>(StatusCodes.Status201Created)
     .Produces(StatusCodes.Status400BadRequest)
     .Produces(StatusCodes.Status409Conflict);
+
+app.MapGet("/api/events", async (
+    AppDbContext db,
+    string? machineId,
+    string? severity,
+    string? status,
+    DateTimeOffset? from,
+    DateTimeOffset? to,
+    int page = 1,
+    int pageSize = 50) =>
+{
+    // Walidacja paginacji
+    if (page < 1)
+    {
+        return Results.BadRequest(new
+        {
+            error = "Numer strony musi być większy od 0."
+        });
+    }
+
+    if (pageSize < 1 || pageSize > 100)
+    {
+        return Results.BadRequest(new
+        {
+            error = "pageSize musi mieścić się w zakresie od 1 do 100."
+        });
+    }
+
+    // Walidacja severity
+    if (severity != null && !allowedSeverities.Contains(severity))
+    {
+        return Results.BadRequest(new
+        {
+            error = "Nieprawidłowy severity."
+        });
+    }
+
+    // Walidacja status
+    var allowedStatuses = new[]
+    {
+        "NEW", "ACKNOWLEDGED", "RESOLVED"
+    };
+
+    if (status != null && !allowedStatuses.Contains(status))
+    {
+        return Results.BadRequest(new
+        {
+            error = "Nieprawidłowy status."
+        });
+    }
+
+    // Walidacja zakresu dat
+    if (from.HasValue && to.HasValue && from.Value >= to.Value)
+    {
+        return Results.BadRequest(new
+        {
+            error = "Data początkowa musi być wcześniejsza od końcowej."
+        });
+    }
+
+    // Pobranie zdarzeń
+    var query = db.Events.AsNoTracking().AsQueryable();
+
+    // Filtrowanie
+    if (!string.IsNullOrWhiteSpace(machineId))
+    {
+        query = query.Where(e => e.MachineId == machineId);
+    }
+
+    if (severity != null)
+    {
+        query = query.Where(e => e.Severity == severity);
+    }
+
+    if (status != null)
+    {
+        query = query.Where(e => e.Status == status);
+    }
+
+    if (from.HasValue)
+    {
+        query = query.Where(e => e.Timestamp >= from.Value.UtcDateTime);
+    }
+
+    if (to.HasValue)
+    {
+        query = query.Where(e => e.Timestamp < to.Value.UtcDateTime);
+    }
+
+    // Liczba wszystkich wyników po filtrowaniu
+    var totalCount = await query.CountAsync();
+
+    // Paginacja i sortowanie
+    var events = await query
+        .OrderByDescending(e => e.Timestamp)
+        .ThenBy(e => e.EventId)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    // Mapowanie na DTO
+    var items = events.Select(e => new EventDto
+    {
+        EventId = e.EventId,
+        MachineId = e.MachineId,
+        Timestamp = e.Timestamp.ToString(
+            "yyyy-MM-dd'T'HH:mm:ss'Z'",
+            CultureInfo.InvariantCulture
+        ),
+        Severity = e.Severity,
+        Code = e.Code,
+        Message = e.Message,
+        Status = e.Status
+    }).ToList();
+
+    var response = new PaginatedEventsDto
+    {
+        Items = items,
+        Page = page,
+        PageSize = pageSize,
+        TotalCount = totalCount,
+        TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+    };
+
+    return Results.Ok(response);
+});
 
 app.Run();
 
