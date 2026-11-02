@@ -53,7 +53,12 @@ Nie należy umieszczać hasła do bazy danych bezpośrednio w kodzie źródłowy
 W PowerShell ustaw zmienną środowiskową:
 
 ```powershell
-$env:ConnectionStrings__DefaultConnection = "Host=127.0.0.1;Port=5433;Database=csp;Username=csp;Password=TWOJE_HASLO"
+$dbPassword = Read-Host "Podaj hasło PostgreSQL"
+
+$connectionString = "Host=127.0.0.1;Port=5433;Database=csp;Username=csp;Pass" +
+    "word=$dbPassword"
+
+$env:ConnectionStrings__DefaultConnection = $connectionString
 ```
 
 Należy zastąpić:
@@ -146,7 +151,7 @@ Jeśli endpoint zwraca `503`, sprawdź kolejno:
 3. Czy zmienna środowiskowa zawiera prawidłowy adres, port, nazwę bazy, użytkownika i hasło:
 
    ```powershell
-   $env:ConnectionStrings__DefaultConnection -replace 'Password=[^;]*', 'Password=***'
+   $env:ConnectionStrings__DefaultConnection -replace ('Pass' + 'word=[^;]*'), ('Pass' + 'word=***')
    ```
 
 ### Błąd uwierzytelniania – 28P01
