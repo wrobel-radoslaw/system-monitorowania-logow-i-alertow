@@ -1,0 +1,98 @@
+[
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T08:01:13Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "1027c4d1-c386-4bc4-8d61-3e30d8f16adf"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T08:01:29Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "78e51061-7311-48a3-82ce-6f447ed4d57b"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T08:03:10Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "0741c7a8-7ce4-4c82-9807-2e8c35bf992d"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T08:04:06Z",
+    "severity": "CRITICAL",
+    "code": "EMERGENCY_STOP",
+    "message": "Emergency stop triggered",
+    "eventId": "008a05a6-c464-4159-8324-c9859b810e76"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T08:05:22Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "51431193-e6c3-4339-9a2b-8f1ff1fd42a2"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T08:07:15Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "f8130c42-3773-4edf-afbd-67f9619699cf"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T08:08:53Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "8d88348a-7eed-4d14-b06d-3fef701966a0"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T08:10:31Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "ed2f89d9-4a2f-40aa-b3c6-4af775a89294"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T08:11:52Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "4be03db0-dc25-44bd-b940-67edfe175330"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T08:12:57Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "3099fdf5-ab99-454a-a901-e35cd47d380d"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T08:14:13Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "3e2434e3-7af0-47bc-88d6-af57da711448"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T08:15:39Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "e1fab9d7-8c7e-434f-9dfb-d3d12c4a3698"
+  }
+]
