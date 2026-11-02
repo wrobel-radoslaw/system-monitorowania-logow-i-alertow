@@ -1,0 +1,7 @@
+{
+  "machineId": "machine-001",
+  "timestamp": "2026-11-02T18:30:00Z",
+  "severity": "INFO",
+  "code": "SYSTEM_START",
+  "message": "System uruchomiony poprawnie"
+}

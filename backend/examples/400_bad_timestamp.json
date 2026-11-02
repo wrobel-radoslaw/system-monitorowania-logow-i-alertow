@@ -1,0 +1,7 @@
+{
+  "machineId": "machine-006",
+  "timestamp": "02-11-2026",
+  "severity": "INFO",
+  "code": "INVALID_DATE",
+  "message": "Niepoprawna data"
+}
