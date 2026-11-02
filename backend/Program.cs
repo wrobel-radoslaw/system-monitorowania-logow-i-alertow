@@ -31,8 +31,21 @@ app.MapGet("/api/health", async (
 {
     try
     {
-        await db.Database.OpenConnectionAsync(cancellationToken);
-        await db.Database.CloseConnectionAsync();
+        var canConnect = await db.Database.CanConnectAsync(cancellationToken);
+
+        if (!canConnect)
+        {
+            return Results.Json(new
+            {
+                status = "unhealthy",
+                database = "disconnected"
+            }, statusCode: 503);
+        }
+
+        await db.Database.ExecuteSqlRawAsync(
+            "SELECT 1",
+            cancellationToken
+        );
 
         return Results.Ok(new
         {
