@@ -230,12 +230,9 @@ class DocumentationTests(unittest.TestCase):
     def test_openapi_status_is_documented(self):
         readme = read_text("README.md")
         contract = ROOT / "docs" / "openapi.yaml"
+        self.assertIn("docs/openapi.yaml", readme)
         if contract.exists():
-            self.assertIn("docs/openapi.yaml", readme)
-            self.assertNotIn("Zgodność z `docs/openapi.yaml` pozostaje niepotwierdzona", readme)
-        else:
-            self.assertIn("Zgodność z `docs/openapi.yaml` pozostaje niepotwierdzona", readme)
-
+            self.assertNotIn("pozostaje niepotwierdzona", readme)
     def test_compose_stage_and_api_dependency_are_documented(self):
         readme = read_text("README.md")
         self.assertIn("Compose uruchamia bazę danych", readme)

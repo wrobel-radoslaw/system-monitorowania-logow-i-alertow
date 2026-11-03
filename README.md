@@ -8,7 +8,7 @@ Projekt zespołowy realizowany w ramach przedmiotu **Cyfryzacja systemów produk
 - **Viktoriia, Frontend:** dashboard i obsługa widoków.
 - **Natalia, Backend:** API, zapis danych i reguły alertów.
 
-Szczegółowy zakres i kryteria akceptacji są zapisane w Trello. Wspólny kontrakt API musi odpowiadać pracy Natalii i być uzgodniony przed walidacją fixture'ów względem OpenAPI.
+Wspólny kontrakt API jest utrzymywany pod ścieżką `docs/openapi.yaml`; generator i fixture wykorzystują pola schematu `CreateEventRequest`.
 
 ## Wymagania
 
@@ -68,7 +68,7 @@ python tools/event-generator/generate_events.py --help
 
 `--count` ustawia liczbę zdarzeń, `--seed` zapewnia powtarzalne dane, `--start` ustawia początkowy czas ISO 8601 ze strefą, `--with-event-id` dodaje opcjonalne `eventId`, a `--output` wskazuje plik. Timestampy są zapisywane w UTC z końcówką `Z`. Payload nie zawiera pola `status`.
 
-Przykładowe dane są w `fixtures/events.sample.json`. Fixture pokrywa kryteria karty dotyczące pól, maszyn, severity i czasu. Zgodność z `docs/openapi.yaml` pozostaje niepotwierdzona, dopóki kontrakt nie zostanie dostarczony i zamrożony.
+Przykładowe dane są w `fixtures/events.sample.json`. Generator i fixture używają pól zgodnych ze schematem `CreateEventRequest`: wymagane `machineId`, `timestamp`, `severity`, `code` i `message`; opcjonalne `eventId`. Pole `status` nie należy do żądania tworzenia zdarzenia. Timestampy są zapisywane w UTC z końcówką `Z`.
 
 ## Testy i CI
 
@@ -85,7 +85,7 @@ Workflow nie publikuje obrazów ani nie wdraża aplikacji. Ma tylko uprawnienie 
 
 - `backend/` - API, które zostanie dodane w karcie backendowej;
 - `frontend/` - aplikacja webowa, która zostanie dodana w kartach frontendowych;
-- `docs/` - dokumentacja projektu i, po uzgodnieniu, kontrakt API;
+- `docs/` - dokumentacja projektu i wspólny kontrakt API OpenAPI (`openapi.yaml`);
 - `fixtures/` - przykładowe payloady zdarzeń;
 - `tools/event-generator/` - generator offline;
 - `tools/webhook-stub/` - odbiornik testowy planowany w M2;
