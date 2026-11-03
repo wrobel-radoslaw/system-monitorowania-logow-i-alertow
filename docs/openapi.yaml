@@ -39,7 +39,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProblemDetails'
 
   /api/events:
     post:
@@ -418,7 +418,6 @@ components:
           type: string
           enum:
             - ERROR_CRITICAL
-            - WARN_BURST
         severity:
           $ref: '#/components/schemas/Severity'
         triggeredAt:
@@ -468,15 +467,26 @@ components:
           type: string
           enum:
             - healthy
+            - unhealthy
         database:
           type: string
           enum:
             - connected
+            - disconnected
 
-    ErrorResponse:
+    ProblemDetails:
       type: object
       properties:
-        error:
+        type:
           type: string
-      required:
-        - error
+          format: uri-reference
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri-reference
