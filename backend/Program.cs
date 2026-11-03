@@ -269,6 +269,10 @@ app.MapPost("/api/events", async (
     if (newAlert != null)
     {
         string? webhookUrl = builder.Configuration["Webhook:Url"];
+        if (string.IsNullOrWhiteSpace(webhookUrl))
+        {
+            webhookUrl = builder.Configuration["WEBHOOK_URL"];
+        }
 
         if (!string.IsNullOrWhiteSpace(webhookUrl))
         {
