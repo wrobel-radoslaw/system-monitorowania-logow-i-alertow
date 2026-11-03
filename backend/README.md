@@ -62,15 +62,96 @@ $env:ConnectionStrings__DefaultConnection = $connectionString
 ```
 
 Należy zastąpić:
+
 - `5433` – portem zwróconym przez `docker compose port db 5432`,
 - `csp` – nazwą bazy danych i użytkownika zgodną z konfiguracją PostgreSQL,
-- `TWOJE_HASLO` – hasłem użytkownika PostgreSQL.
+- hasło – hasłem użytkownika PostgreSQL.
 
 **Ważne:** zmienna ustawiona w ten sposób obowiązuje tylko w aktualnym oknie PowerShell. Backend należy uruchamiać w tym samym oknie terminala.
 
-## 4. Uruchomienie backendu
+## 4. Tworzenie i aktualizowanie migracji bazy danych
 
-Otwórz drugie okno PowerShell lub przejdź do katalogu `backend`:
+Projekt wykorzystuje Entity Framework Core do zarządzania schematem bazy danych.
+
+Przed utworzeniem migracji należy upewnić się, że:
+
+- kontener PostgreSQL jest uruchomiony,
+- zmienna `ConnectionStrings__DefaultConnection` jest ustawiona,
+- polecenia są wykonywane w katalogu `backend`.
+
+### Instalacja narzędzia EF Core
+
+Jeśli narzędzie `dotnet-ef` nie jest jeszcze zainstalowane, wykonaj:
+
+```powershell
+dotnet tool install --global dotnet-ef
+```
+
+Jeżeli narzędzie jest już zainstalowane, można sprawdzić jego wersję:
+
+```powershell
+dotnet ef --version
+```
+
+W projekcie musi być również dostępny pakiet `Microsoft.EntityFrameworkCore.Design`. Jeśli nie został wcześniej dodany:
+
+```powershell
+dotnet add package Microsoft.EntityFrameworkCore.Design
+```
+
+### Utworzenie migracji
+
+Przejdź do katalogu `backend`:
+
+```powershell
+cd backend
+```
+
+Utwórz nową migrację, np. dla encji `Event`:
+
+```powershell
+dotnet ef migrations add CreateEvents
+```
+
+Migracja opisuje zmiany w strukturze bazy danych wynikające z konfiguracji encji i `AppDbContext`.
+
+Pliki migracji zostaną zapisane w katalogu `Migrations`.
+
+### Zastosowanie migracji
+
+Aby utworzyć lub zaktualizować tabele w bazie PostgreSQL, wykonaj:
+
+```powershell
+dotnet ef database update
+```
+
+Po poprawnym wykonaniu polecenia tabela `events` powinna być dostępna w bazie danych.
+
+### Przydatne polecenia
+
+Wyświetlenie listy migracji:
+
+```powershell
+dotnet ef migrations list
+```
+
+Utworzenie kolejnej migracji po zmianie encji:
+
+```powershell
+dotnet ef migrations add NazwaMigracji
+```
+
+Zastosowanie wszystkich oczekujących migracji:
+
+```powershell
+dotnet ef database update
+```
+
+**Ważne:** migracji nie należy tworzyć ponownie przy każdym uruchomieniu aplikacji. Nową migrację tworzy się dopiero po zmianie modelu danych lub konfiguracji encji. W przypadku zwykłego uruchamiania projektu wystarczy zastosować istniejące migracje poleceniem `dotnet ef database update`.
+
+## 5. Uruchomienie backendu
+
+Otwórz katalog `backend` (jeśli nie jesteś już w nim):
 
 ```powershell
 cd backend
@@ -100,11 +181,15 @@ Przy aktualnej konfiguracji `launchSettings.json` API jest dostępne pod adresem
 http://localhost:5136
 ```
 
-## 5. Sprawdzenie działania API
+**Uwaga:** backend należy uruchomić w tej samej sesji PowerShell, w której ustawiono zmienną środowiskową z connection stringiem.
 
-```text
-http://localhost:5136/api/health
-```
+## 6. Sprawdzenie działania API
+
+### Endpoint Health
+
+Otwórz adres:
+
+[http://localhost:5136/api/health](http://localhost:5136/api/health)
 
 Endpoint sprawdza możliwość nawiązania połączenia z PostgreSQL.
 
@@ -130,7 +215,48 @@ W przypadku braku połączenia z bazą:
 }
 ```
 
-## 6. Rozwiązywanie problemów
+### Dokumentacja Swagger
+
+Po uruchomieniu backendu otwórz w przeglądarce:
+
+[http://localhost:5136/swagger](http://localhost:5136/swagger)
+
+Endpointy są podzielone na grupy:
+
+- **Health** – sprawdzanie dostępności API i bazy danych.
+- **Events** – tworzenie nowych zdarzeń.
+
+### Testowanie POST /api/events
+
+Przykładowe zapytania testowe znajdują się w katalogu:
+
+```text
+backend/
+└── examples/
+    ├── ...
+```
+
+Pliki zawierają przykłady poprawnych i niepoprawnych żądań, które pozwalają sprawdzić działanie walidacji oraz obsługę identyfikatorów zdarzeń.
+
+### Oczekiwane odpowiedzi
+
+| Kod HTTP | Znaczenie | Przypadek testowy |
+|---|---|---|
+| `201 Created` | Zdarzenie zostało utworzone | Poprawny payload |
+| `400 Bad Request` | Niepoprawne żądanie | Brak wymaganego pola, niepoprawny timestamp, pusty eventId lub niedozwolone dodatkowe pole |
+| `409 Conflict` | Konflikt identyfikatora | Ponowne wysłanie zdarzenia z istniejącym eventId |
+
+W przypadku poprawnego żądania odpowiedź powinna zawierać utworzony obiekt `EventDto`, w tym:
+
+- `eventId` – identyfikator podany przez klienta lub wygenerowany automatycznie,
+- `machineId` – identyfikator urządzenia,
+- `timestamp` – czas zdarzenia w formacie UTC,
+- `severity` – poziom ważności zdarzenia,
+- `code` – kod zdarzenia,
+- `message` – opis zdarzenia,
+- `status` – zawsze `NEW` dla nowo utworzonego zdarzenia.
+
+## 7. Rozwiązywanie problemów
 
 ### Błąd połączenia z PostgreSQL
 
@@ -186,7 +312,23 @@ Ustaw takie samo hasło w zmiennej środowiskowej backendu.
 
 **Uwaga:** zmiana `POSTGRES_PASSWORD` w pliku `.env` nie zmienia automatycznie hasła użytkownika w już zainicjalizowanej bazie danych. Dane PostgreSQL są przechowywane w wolumenie Dockera.
 
-## 7. Zatrzymanie usług
+### Błąd związany z migracjami
+
+Jeśli aplikacja zgłasza problem z brakującą tabelą `events`, sprawdź, czy migracja została zastosowana:
+
+```powershell
+dotnet ef migrations list
+```
+
+Następnie wykonaj:
+
+```powershell
+dotnet ef database update
+```
+
+Jeśli polecenie `dotnet ef` nie jest rozpoznawane, sprawdź instalację narzędzia `dotnet-ef`.
+
+## 8. Zatrzymanie usług
 
 Aby zatrzymać kontener PostgreSQL:
 
