@@ -1,0 +1,18 @@
+# Local configuration and credentials
+.env
+.env.*
+
+# Git metadata
+.git
+
+# Build and test outputs
+**/bin/
+**/obj/
+**/TestResults/
+
+# Frontend dependencies and IDE files
+**/node_modules/
+**/.vs/
+**/.idea/
+*.user
+*.suo

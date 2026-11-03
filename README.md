@@ -23,24 +23,53 @@ W katalogu głównym repozytorium utwórz lokalny plik `.env`:
 Copy-Item .env.example .env
 ```
 
-Docker przydziela wolny port hosta z zakresu zaczynającego się od `5432`; publikacja jest ograniczona do `127.0.0.1`. Rzeczywisty port sprawdzisz poleceniem `docker compose port db 5432`. W `.env` możesz ustawić `POSTGRES_PORT` na pojedynczy port lub inny zakres. Wewnątrz sieci Compose PostgreSQL słucha na porcie `5432`. Nie zatrzymuj innych baz ani kontenerów.
+`.env.example` zawiera ustawienia wyłącznie do lokalnego developmentu. Zmień `POSTGRES_PASSWORD` w lokalnym `.env`, nie używaj tych wartości na produkcji i nie commituj `.env`.
 
-`.env.example` zawiera ustawienia wyłącznie do lokalnego developmentu. Nie używaj tych wartości na produkcji i nie commituj `.env`.
+### Porty i połączenia
 
-## PostgreSQL
+- PostgreSQL słucha wewnątrz sieci Compose na `db:5432`. Port hosta jest przydzielany z zakresu `POSTGRES_PORT` (domyślnie `5432-5500`) i publikowany wyłącznie na `127.0.0.1`.
+- API słucha wewnątrz Compose na `api:8080`. Port hosta określa `API_PORT` (domyślnie `5136`) i również jest publikowany wyłącznie na `127.0.0.1`.
+- API łączy się z PostgreSQL przez nazwę serwisu `db`, a nie przez `localhost`.
 
-Na obecnym etapie Compose uruchamia bazę danych. Serwisy API i frontend zostaną dodane po dostarczeniu kodu i Dockerfile przez właścicieli tych kart. Nie tworzymy atrap aplikacji, które udają gotową integrację.
+Rzeczywiste porty hosta można sprawdzić poleceniami:
+
+```powershell
+docker compose port db 5432
+docker compose port api 8080
+```
+
+Zmienne `POSTGRES_DB`, `POSTGRES_USER` i `POSTGRES_PASSWORD` są współdzielone przez kontener bazy i konfigurację connection stringa API. Hasło nie jest wpisane na stałe w obrazie ani w plikach Compose.
+
+## Uruchamianie Docker Compose
 
 ```powershell
 docker compose config --quiet
-docker compose up -d db
+docker compose up --build -d
 docker compose ps
-docker compose exec db pg_isready -U csp -d csp
 ```
 
-Poczekaj, aż stan bazy w `docker compose ps` będzie `healthy`. Healthcheck `pg_isready` potwierdza gotowość serwera do przyjmowania połączeń; nie sprawdza poprawności hasła aplikacji.
+Compose uruchamia PostgreSQL i API. API rozpoczyna start po osiągnięciu stanu `healthy` przez bazę. Healthcheck PostgreSQL używa `pg_isready`; healthcheck API wykonuje rzeczywiste żądanie `GET /api/health` na porcie kontenera `8080`.
 
-Zatrzymanie usług bez usuwania danych:
+Stan i logi usług:
+
+```powershell
+docker compose ps
+docker compose logs -f db api
+```
+
+API zwraca `200` z informacją o połączeniu z bazą, gdy PostgreSQL jest dostępny. Gdy baza jest niedostępna, `GET /api/health` zwraca `503` i kontener API przechodzi w stan `unhealthy`. Po przywróceniu bazy endpoint ponownie powinien zwracać `200`.
+
+Test endpointu z hosta:
+
+```powershell
+Invoke-RestMethod http://localhost:5136/api/health
+```
+
+Jeżeli `API_PORT` ma inną wartość, użyj jej zamiast `5136`.
+
+### Zatrzymywanie
+
+Zatrzymanie i usunięcie kontenerów bez kasowania danych PostgreSQL:
 
 ```powershell
 docker compose down
@@ -52,9 +81,11 @@ Usunięcie również wolumenu i danych bazy:
 docker compose down -v
 ```
 
-`down -v` trwale usuwa lokalny wolumen bazy. Używaj go tylko wtedy, gdy chcesz skasować te dane.
+`down -v` trwale usuwa lokalny wolumen `csp_postgres_data`. Używaj go wyłącznie wtedy, gdy dane mają zostać skasowane.
 
-Po dostarczeniu kodu API i frontendu do Compose dołączymy oba serwisy. API musi udostępniać `GET /api/health` zwracający 200 przy sprawnym połączeniu z bazą oraz status 503 (lub inny spoza zakresu 2xx), gdy baza jest niedostępna. Kontener API nie będzie oznaczany jako zdrowy, dopóki ten warunek nie zostanie sprawdzony na rzeczywistym obrazie.
+### Zakres usług
+
+W aktualnym repozytorium dostępne są serwisy PostgreSQL i API. Serwis frontendowy nie jest dodawany w tej karcie, ponieważ jego implementacja i pliki uruchomieniowe należą do osobnej karty frontendowej. Po dostarczeniu rzeczywistej aplikacji i jej Dockerfile Compose zostanie uzupełniony o frontend; nie jest uruchamiana żadna atrapa.
 
 ## Generator zdarzeń
 
@@ -83,8 +114,8 @@ Workflow nie publikuje obrazów ani nie wdraża aplikacji. Ma tylko uprawnienie 
 
 ## Struktura
 
-- `backend/` - API, które zostanie dodane w karcie backendowej;
-- `frontend/` - aplikacja webowa, która zostanie dodana w kartach frontendowych;
+- `backend/` - API .NET 10;
+- `frontend/` - aplikacja webowa, dodawana w kartach frontendowych;
 - `docs/` - dokumentacja projektu i wspólny kontrakt API OpenAPI (`openapi.yaml`);
 - `fixtures/` - przykładowe payloady zdarzeń;
 - `tools/event-generator/` - generator offline;
