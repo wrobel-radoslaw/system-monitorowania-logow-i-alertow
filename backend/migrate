@@ -1,0 +1,19 @@
+$events = Get-Content .\events.json -Raw | ConvertFrom-Json
+
+foreach ($event in $events) {
+    $body = $event | ConvertTo-Json -Depth 5
+
+    try {
+        $response = Invoke-RestMethod `
+            -Uri "http://localhost:5136/api/events" `
+            -Method Post `
+            -ContentType "application/json" `
+            -Body $body
+
+        Write-Host "Dodano zdarzenie: $($response.eventId)" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "Błąd podczas wysyłania zdarzenia: $($event.code)" -ForegroundColor Red
+        Write-Host $_.Exception.Message
+    }
+}

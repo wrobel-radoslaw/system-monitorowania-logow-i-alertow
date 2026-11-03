@@ -22,6 +22,48 @@ namespace backend.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("backend.Models.Alert", b =>
+                {
+                    b.Property<string>("AlertId")
+                        .HasColumnType("text")
+                        .HasColumnName("alert_id");
+
+                    b.Property<string>("DeliveryStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("PENDING")
+                        .HasColumnName("delivery_status");
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("event_id");
+
+                    b.Property<string>("MachineId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("machine_id");
+
+                    b.Property<string>("RuleName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("rule_name");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("severity");
+
+                    b.Property<DateTime>("TriggeredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("triggered_at");
+
+                    b.HasKey("AlertId");
+
+                    b.ToTable("alerts", (string)null);
+                });
+
             modelBuilder.Entity("backend.Models.Event", b =>
                 {
                     b.Property<string>("EventId")

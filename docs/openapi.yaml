@@ -1,0 +1,492 @@
+openapi: 3.1.0
+
+info:
+  title: System monitorowania logów i alertów API
+  version: 1.0.0
+  description: |
+    Wspólny kontrakt API dla backendu, frontendu, generatora zdarzeń,
+    systemu alertów i testów automatycznych.
+
+servers:
+  - url: http://localhost:5136
+    description: Środowisko lokalne
+
+tags:
+  - name: Health
+    description: Stan API i bazy danych
+  - name: Events
+    description: Zarządzanie zdarzeniami
+  - name: Alerts
+    description: Informacje o alertach
+
+paths:
+
+  /api/health:
+    get:
+      tags:
+        - Health
+      summary: Sprawdza dostępność API i bazy danych
+      operationId: getHealth
+      responses:
+        '200':
+          description: API i baza danych są dostępne
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthDto'
+        '503':
+          description: Baza danych jest niedostępna
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /api/events:
+    post:
+      tags:
+        - Events
+      summary: Tworzy nowe zdarzenie
+      operationId: createEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+      responses:
+        '201':
+          description: Zdarzenie zostało utworzone
+          headers:
+            Location:
+              description: Adres utworzonego zdarzenia
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+        '400':
+          description: Nieprawidłowe dane wejściowe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Zdarzenie o podanym eventId już istnieje
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '503':
+          description: Baza danych jest niedostępna
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+    get:
+      tags:
+        - Events
+      summary: Pobiera listę zdarzeń
+      operationId: getEvents
+      parameters:
+        - name: machineId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filtr identyfikatora maszyny
+
+        - name: severity
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Severity'
+
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/EventStatus'
+
+        - name: from
+          in: query
+          required: false
+          description: Początek zakresu czasu (włącznie)
+          schema:
+            type: string
+            format: date-time
+
+        - name: to
+          in: query
+          required: false
+          description: Koniec zakresu czasu (wyłącznie)
+          schema:
+            type: string
+            format: date-time
+
+        - name: page
+          in: query
+          required: false
+          description: Numer strony, zaczynając od 1
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+
+        - name: pageSize
+          in: query
+          required: false
+          description: Liczba elementów na stronie
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+
+      responses:
+        '200':
+          description: Lista zdarzeń
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEventsDto'
+        '400':
+          description: Nieprawidłowe parametry filtrowania lub stronicowania
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '503':
+          description: Baza danych jest niedostępna
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /api/events/{eventId}:
+    get:
+      tags:
+        - Events
+      summary: Pobiera pojedyncze zdarzenie
+      operationId: getEventById
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Znalezione zdarzenie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+        '404':
+          description: Zdarzenie nie istnieje
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '503':
+          description: Baza danych jest niedostępna
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /api/events/{eventId}/status:
+    patch:
+      tags:
+        - Events
+      summary: Zmienia status zdarzenia
+      operationId: changeEventStatus
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusChangeRequest'
+      responses:
+        '200':
+          description: Status został zmieniony
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+        '400':
+          description: Nieprawidłowe dane lub niedozwolony status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Zdarzenie nie istnieje
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Status zdarzenia zmienił się od czasu odczytu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '503':
+          description: Baza danych jest niedostępna
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /api/alerts:
+    get:
+      tags:
+        - Alerts
+      summary: Pobiera listę wygenerowanych alertów
+      operationId: getAlerts
+      responses:
+        '200':
+          description: Lista alertów
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlertDto'
+        '503':
+          description: Baza danych jest niedostępna
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+components:
+
+  schemas:
+
+    Severity:
+      type: string
+      enum:
+        - INFO
+        - WARN
+        - ERROR
+        - CRITICAL
+
+    EventStatus:
+      type: string
+      enum:
+        - NEW
+        - ACKNOWLEDGED
+        - RESOLVED
+
+    AlertDeliveryStatus:
+      type: string
+      enum:
+        - PENDING
+        - SENT
+        - FAILED
+
+    CreateEventRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - machineId
+        - timestamp
+        - severity
+        - code
+        - message
+      properties:
+        eventId:
+          type: string
+          minLength: 1
+          description: Opcjonalny identyfikator zdarzenia
+        machineId:
+          type: string
+          minLength: 1
+        timestamp:
+          type: string
+          format: date-time
+          description: Data i czas zdarzenia w ISO 8601 ze strefą czasową
+          examples:
+            - '2026-11-02T20:30:00Z'
+        severity:
+          $ref: '#/components/schemas/Severity'
+        code:
+          type: string
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+
+    EventDto:
+      type: object
+      additionalProperties: false
+      required:
+        - eventId
+        - machineId
+        - timestamp
+        - severity
+        - code
+        - message
+        - status
+      properties:
+        eventId:
+          type: string
+        machineId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        severity:
+          $ref: '#/components/schemas/Severity'
+        code:
+          type: string
+        message:
+          type: string
+        status:
+          $ref: '#/components/schemas/EventStatus'
+
+    StatusChangeRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - expectedStatus
+        - status
+      properties:
+        expectedStatus:
+          $ref: '#/components/schemas/EventStatus'
+          description: Status oczekiwany przed aktualizacją
+        status:
+          $ref: '#/components/schemas/EventStatus'
+          description: Docelowy status zdarzenia
+
+    PaginatedEventsDto:
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - page
+        - pageSize
+        - totalCount
+        - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventDto'
+        page:
+          type: integer
+          minimum: 1
+        pageSize:
+          type: integer
+          minimum: 1
+          maximum: 100
+        totalCount:
+          type: integer
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+
+    AlertDto:
+      type: object
+      additionalProperties: false
+      required:
+        - alertId
+        - eventId
+        - machineId
+        - ruleName
+        - severity
+        - triggeredAt
+        - deliveryStatus
+      properties:
+        alertId:
+          type: string
+        eventId:
+          type: string
+        machineId:
+          type: string
+        ruleName:
+          type: string
+          enum:
+            - ERROR_CRITICAL
+        severity:
+          $ref: '#/components/schemas/Severity'
+        triggeredAt:
+          type: string
+          format: date-time
+        deliveryStatus:
+          $ref: '#/components/schemas/AlertDeliveryStatus'
+
+    WebhookPayload:
+      type: object
+      additionalProperties: false
+      description: |
+        Payload wysyłany do zewnętrznego odbiorcy po wygenerowaniu alertu.
+        Nie zawiera wewnętrznego statusu dostarczenia webhooka.
+      required:
+        - alertId
+        - eventId
+        - machineId
+        - ruleName
+        - severity
+        - triggeredAt
+      properties:
+        alertId:
+          type: string
+        eventId:
+          type: string
+        machineId:
+          type: string
+        ruleName:
+          type: string
+          enum:
+            - ERROR_CRITICAL
+            - WARN_BURST
+        severity:
+          $ref: '#/components/schemas/Severity'
+        triggeredAt:
+          type: string
+          format: date-time
+
+    HealthDto:
+      type: object
+      required:
+        - status
+        - database
+      properties:
+        status:
+          type: string
+          enum:
+            - healthy
+            - unhealthy
+        database:
+          type: string
+          enum:
+            - connected
+            - disconnected
+
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri-reference
