@@ -1,2 +1,2 @@
-// Types for the Logs slice (API DTOs, view models). Empty until the API contract is agreed.
-export {};
+// Event types are shared with the Dashboard slice: see shared/types/events.ts.
+export type { FilterValues } from './filters';

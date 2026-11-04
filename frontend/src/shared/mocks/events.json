@@ -1,0 +1,802 @@
+[
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:01:13Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "1027c4d1-c386-4bc4-8d61-3e30d8f16adf"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T00:01:29Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "78e51061-7311-48a3-82ce-6f447ed4d57b"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:03:10Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "0741c7a8-7ce4-4c82-9807-2e8c35bf992d"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T00:04:06Z",
+    "severity": "CRITICAL",
+    "code": "EMERGENCY_STOP",
+    "message": "Emergency stop triggered",
+    "eventId": "008a05a6-c464-4159-8324-c9859b810e76"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:05:22Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "51431193-e6c3-4339-9a2b-8f1ff1fd42a2"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:07:15Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "f8130c42-3773-4edf-afbd-67f9619699cf"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:08:53Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "8d88348a-7eed-4d14-b06d-3fef701966a0"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T00:10:31Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "ed2f89d9-4a2f-40aa-b3c6-4af775a89294"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:11:52Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "4be03db0-dc25-44bd-b940-67edfe175330"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:12:57Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "3099fdf5-ab99-454a-a901-e35cd47d380d"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T00:14:13Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "3e2434e3-7af0-47bc-88d6-af57da711448"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T00:15:39Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "e1fab9d7-8c7e-434f-9dfb-d3d12c4a3698"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:16:36Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "c74803e3-1ba1-4215-8228-3d15a9ec0806"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T00:17:39Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "0b21fbac-7825-4d68-8792-3986bb968a43"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T00:18:01Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "0326324d-fb69-4ffb-ba18-90c78092b4d4"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T00:19:07Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "93ea5c4e-d8f3-4418-b3d4-e7115804f922"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:19:57Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "f463b337-d20b-4d59-9b61-0487c89da11b"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T00:20:52Z",
+    "severity": "ERROR",
+    "code": "SENSOR_FAILURE",
+    "message": "Sensor reading unavailable",
+    "eventId": "deb8fc4c-7b29-4d0b-8e5e-18baf320cd57"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T00:21:55Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "58989008-6a17-49af-9b56-9643d037cdff"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:23:12Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "a2a7ae1f-3ac7-452c-8df8-440407295e42"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T00:24:55Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "d1020a15-d9ed-47e3-8c0e-95ee8d103ed3"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:25:06Z",
+    "severity": "CRITICAL",
+    "code": "OVERHEAT_SHUTDOWN",
+    "message": "Emergency shutdown: overheating",
+    "eventId": "03ba33db-73f7-4a8e-8445-d656de3a5db5"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:25:41Z",
+    "severity": "ERROR",
+    "code": "SENSOR_FAILURE",
+    "message": "Sensor reading unavailable",
+    "eventId": "2f429ce5-9ff3-478f-8c1b-0c3e1c07724e"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:26:02Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "2b0b8c12-f3b3-4f32-8702-66c44155d7ef"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:27:32Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "1d3b993f-7949-4eab-bf1a-355e526eb523"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T00:28:26Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "1bd7ce73-4227-4e21-b023-580ccbd3f5e0"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T00:30:11Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "0492c4f5-39b2-4c95-8554-55e8f9bddea5"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:31:09Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "6d39eb43-ad9c-4dde-819d-7ca7b46108cc"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T00:31:38Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "6518093d-07db-4924-a604-8457861e02ec"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:31:46Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "f7c882f4-202c-4828-8c71-7095bcc99ae8"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:31:56Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "eacc110e-4f73-4d94-9391-f9b9dbc799b0"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T00:33:09Z",
+    "severity": "CRITICAL",
+    "code": "EMERGENCY_STOP",
+    "message": "Emergency stop triggered",
+    "eventId": "8f8b2b83-022b-4320-a161-5022409a8a78"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:35:05Z",
+    "severity": "ERROR",
+    "code": "SENSOR_FAILURE",
+    "message": "Sensor reading unavailable",
+    "eventId": "d3f21dcc-2be8-4b46-b5fa-6dd891fde85c"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:35:31Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "92c9357d-34ac-4d78-9959-b9ef58d07674"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T00:36:35Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "63db01fc-aa7c-414b-b01d-bf291abb8ba3"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T00:37:17Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "e65150b5-66fe-4086-9f22-96509cb471a5"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T00:39:07Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "903715c8-fcaf-4a5a-8fa6-cf3e53e6d093"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:39:35Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "d67393d6-18ae-413e-aca9-1679443baac5"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:41:14Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "10b8fe22-3c11-4549-8853-4206fc4a447e"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:41:36Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "3685156b-89c8-4c4d-a936-7ed92aa3300b"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:42:24Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "4a8d15d8-1d29-4588-971c-eeee56befa39"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T00:43:39Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "521b18a9-1ab1-442f-852f-4fbe8d19821f"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:45:30Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "d418f7af-25b7-401a-89c1-ffeffdc1786b"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:45:40Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "90e32e82-3945-4353-8cde-ce75921ebce6"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:47:35Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "ecd1345e-88c7-40f6-907f-96694ba955f3"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:49:16Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "032b7328-4bb5-4b5c-93e8-9d320bb662a8"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:50:09Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "ca357568-e293-4bf1-937c-99611d775b7c"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T00:50:30Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "ae4ecf4b-2ad9-440a-b36e-bf511d95389b"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:52:27Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "f8633958-ce75-44ba-a0d6-c766f6f62c28"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:53:59Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "35263b45-19a2-405c-9080-6f017a1d556c"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:54:01Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "4ba927c3-ecf4-4ccb-bb8a-99a2c96fa758"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:54:52Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "106ee2ab-101e-45eb-a607-b61550332cb8"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T00:55:25Z",
+    "severity": "ERROR",
+    "code": "SENSOR_FAILURE",
+    "message": "Sensor reading unavailable",
+    "eventId": "c725bd97-9e28-4761-88fe-a5d73716e7ea"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T00:55:59Z",
+    "severity": "CRITICAL",
+    "code": "EMERGENCY_STOP",
+    "message": "Emergency stop triggered",
+    "eventId": "4eac98d6-3534-4cae-8aa6-72352ee7af97"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:57:44Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "c0d76560-fbbe-4381-96e3-e38047e1a38b"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:58:34Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "53c617eb-0a82-4695-8e89-6a65f772f8ea"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T00:59:17Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "943863a5-9c84-4b6a-8b52-5b4f19d7b403"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:59:46Z",
+    "severity": "ERROR",
+    "code": "SENSOR_FAILURE",
+    "message": "Sensor reading unavailable",
+    "eventId": "66daa365-3e67-426c-8eea-590b05373b76"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T00:59:49Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "c02fc22a-4a73-47fa-8289-eb06a2a866b4"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T01:01:40Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "805db06a-19d6-473b-a778-507cdbeef77a"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:02:46Z",
+    "severity": "ERROR",
+    "code": "SENSOR_FAILURE",
+    "message": "Sensor reading unavailable",
+    "eventId": "2df810b9-2c59-4859-aa4d-a822f3009a5c"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T01:03:26Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "d5ae305b-83ac-4b7e-b596-41d21b5c56d3"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:05:21Z",
+    "severity": "ERROR",
+    "code": "SENSOR_FAILURE",
+    "message": "Sensor reading unavailable",
+    "eventId": "e91553a9-8ba5-4d34-a445-2ecf34ecf2ed"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:05:44Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "286bef29-8999-48a7-aec1-5d384c867062"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T01:07:24Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "725a9a5b-f6a0-4500-ae9c-8563107d72d5"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:09:13Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "654d479a-02c8-461b-b40c-1a6589be4b4b"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T01:10:16Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "eec1754c-a57d-441e-8b06-718c063fa2b6"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T01:11:45Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "97f2a702-2366-4676-947f-81435add92d1"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:12:36Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "9cc930d3-2c13-4c19-a6ad-51fd906704c3"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T01:12:59Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "e49df6bb-803a-4506-9136-bf628758ff4d"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T01:13:30Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "7a946602-afdb-49d2-bebd-0e05501fc6f4"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T01:14:42Z",
+    "severity": "CRITICAL",
+    "code": "EMERGENCY_STOP",
+    "message": "Emergency stop triggered",
+    "eventId": "eaeed19b-ba6c-4c4a-a82d-2fef9c7d498a"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T01:16:40Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "a5319f47-82fe-4a4a-8360-b3b71251310b"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T01:17:20Z",
+    "severity": "ERROR",
+    "code": "SENSOR_FAILURE",
+    "message": "Sensor reading unavailable",
+    "eventId": "d9577b6b-4cb0-4ec1-b14b-69dc4c78c7ab"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T01:18:37Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "e587dd21-1f8c-497a-9b34-fa8d15c0cdd5"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T01:18:57Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "f112cfd0-37b5-4bac-ad3f-ad4c40270546"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T01:20:25Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "591550ff-a310-4849-b797-5b2864c371cf"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T01:21:33Z",
+    "severity": "INFO",
+    "code": "MACHINE_STARTED",
+    "message": "Machine started",
+    "eventId": "4153bbc7-ced5-469f-9724-925ffb314da0"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:21:51Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "d788c7cc-9ded-44fd-8698-06eaf81f5c80"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T01:23:40Z",
+    "severity": "CRITICAL",
+    "code": "EMERGENCY_STOP",
+    "message": "Emergency stop triggered",
+    "eventId": "d9db30af-f8a1-4e70-bdb1-8a28ec9f6fbf"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T01:24:02Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "20572aeb-7029-4815-9351-d2c1e8fb46b5"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T01:24:18Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "68815fda-88b7-4c6b-99c6-1aa86e671698"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:24:50Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "0106bb05-8f33-4483-bfe4-440e60fc47fa"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T01:24:54Z",
+    "severity": "CRITICAL",
+    "code": "OVERHEAT_SHUTDOWN",
+    "message": "Emergency shutdown: overheating",
+    "eventId": "3e036333-9b0a-4817-b91c-85fda0a59518"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T01:25:31Z",
+    "severity": "ERROR",
+    "code": "SENSOR_FAILURE",
+    "message": "Sensor reading unavailable",
+    "eventId": "45f21e94-3350-42dc-8ad6-c1c425fe3a18"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:27:13Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "f93ee7cc-dae7-40b2-8f03-fd21dc7a4bee"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:28:07Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "357d6f2e-c4e1-49a1-9f2e-490cdb0f0126"
+  },
+  {
+    "machineId": "conveyor-04",
+    "timestamp": "2026-01-01T01:28:44Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "cebb898a-e76d-45ef-9baf-02cfcf80f751"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T01:30:11Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "a63e0c32-f938-47b0-b96c-c27ac2d532fa"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:31:07Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "c234472f-5b58-496a-ad61-1a3e80c6bcbd"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T01:32:04Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "4e0751d7-59a7-4b13-b315-d969b7ccba58"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:32:19Z",
+    "severity": "WARN",
+    "code": "VIBRATION_ELEVATED",
+    "message": "Vibration level elevated",
+    "eventId": "61e406a6-60a7-47b7-aaf5-c033a5cd95e7"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T01:33:41Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "bd1296cd-e1b4-4960-b8e7-df9b992149e8"
+  },
+  {
+    "machineId": "lathe-02",
+    "timestamp": "2026-01-01T01:34:58Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "effe76e0-68b1-43c9-8454-6026d5a7eb2e"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:35:56Z",
+    "severity": "WARN",
+    "code": "TEMP_HIGH",
+    "message": "Temperature above nominal range",
+    "eventId": "32864238-87ec-4e86-ab39-20349eba8775"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T01:37:11Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "5604c3b6-67be-4998-b866-68c16d05c818"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T01:38:47Z",
+    "severity": "ERROR",
+    "code": "FEED_JAM",
+    "message": "Material feed jammed",
+    "eventId": "a6142e5b-f78d-4952-a3ee-54d43f64c50c"
+  },
+  {
+    "machineId": "press-01",
+    "timestamp": "2026-01-01T01:40:20Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "c76330af-a23c-4b27-a7f5-2fa9a117511f"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:41:59Z",
+    "severity": "CRITICAL",
+    "code": "OVERHEAT_SHUTDOWN",
+    "message": "Emergency shutdown: overheating",
+    "eventId": "9aff956c-c6ad-4327-90b9-320712cb2f3f"
+  },
+  {
+    "machineId": "cnc-03",
+    "timestamp": "2026-01-01T01:43:51Z",
+    "severity": "INFO",
+    "code": "CYCLE_COMPLETED",
+    "message": "Production cycle completed",
+    "eventId": "26ee0eac-4dbd-4dc9-8b53-c16baf5e490b"
+  }
+]

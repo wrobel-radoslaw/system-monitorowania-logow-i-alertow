@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Log Monitor</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#000}
+.app{--bg:#000000;--surface:#0b0b0b;--surface2:#141414;--border:#222222;--text:#ffffff;--muted:#a3a3a3;--hover:#121212;--accent:#22c55e;--accent-soft:rgba(34,197,94,0.12);--on-accent:#000000;--success:#4ade80;--danger:#f87171;--warn:#fbbf24;--info:#60a5fa;transition:background .2s,color .2s}
+.app.light{--bg:#ffffff;--surface:#fafafa;--surface2:#f2f2f2;--border:#e4e4e7;--text:#0a0a0a;--muted:#52525b;--hover:#f4f4f5;--accent:#15803d;--accent-soft:rgba(21,128,61,0.10);--on-accent:#ffffff;--success:#15803d;--danger:#b91c1c;--warn:#a16207;--info:#1d4ed8}
+.app button,.app input{font-family:inherit}
+.app :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.nav-item{all:unset;box-sizing:border-box;display:block;width:100%;padding:10px 14px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:17px;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--hover);color:var(--text)}
+.nav-item .lbl{display:inline-block;padding-bottom:6px;border-bottom:2px solid transparent;transition:border-color .2s}
+.nav-item.active{color:var(--text)}
+.nav-item.active .lbl{border-bottom-color:var(--accent)}
+.tab{all:unset;box-sizing:border-box;cursor:pointer;padding:8px 12px 0;border-radius:8px 8px 0 0;color:var(--muted);font-size:17px;transition:background .15s,color .15s}
+.tab .lbl{display:inline-block;padding-bottom:12px;border-bottom:2px solid transparent;transition:border-color .2s}
+.tab:hover{color:var(--text);background:var(--hover)}
+.tab.active{color:var(--text)}
+.tab.active .lbl{border-bottom-color:var(--accent)}
+.icon-btn{all:unset;box-sizing:border-box;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid var(--border);color:var(--text);cursor:pointer;transition:background .15s,border-color .15s}
+.icon-btn:hover{background:var(--hover);border-color:var(--muted)}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;padding:9px 14px;min-height:40px;display:inline-flex;align-items:center;gap:8px;border-radius:8px;border:1px solid var(--border);color:var(--text);font-size:14px;transition:background .15s,border-color .15s}
+.btn:hover{background:var(--hover);border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
+.btn.primary:hover{filter:brightness(1.08)}
+.pill{all:unset;box-sizing:border-box;cursor:pointer;padding:6px 14px;border-radius:999px;border:1px solid var(--border);color:var(--muted);font-size:14px;transition:background .15s,color .15s,border-color .15s}
+.pill:hover{background:var(--hover);color:var(--text)}
+.pill.active{color:var(--text);border-color:var(--accent);background:var(--accent-soft)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;box-sizing:border-box;transition:border-color .15s}
+.card.hov:hover{border-color:var(--muted)}
+.row{transition:background .12s}
+.row:hover{background:var(--hover)}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.err{color:var(--danger)}.warn{color:var(--warn)}.info{color:var(--info)}.ok{color:var(--success)}.muted{color:var(--muted)}
+.bar{background:var(--accent);opacity:.85;border-radius:3px 3px 0 0;flex:1;min-width:4px;transition:opacity .15s}
+.bar:hover{opacity:1}
+.msg{max-width:72%;padding:12px 16px;border-radius:12px;font-size:15px;line-height:1.5}
+.msg.user{align-self:flex-end;background:var(--accent-soft);border:1px solid var(--accent)}
+.msg.bot{align-self:flex-start;background:var(--surface2);border:1px solid var(--border)}
+.chip{all:unset;cursor:pointer;padding:8px 12px;border-radius:8px;border:1px dashed var(--border);color:var(--muted);font-size:14px;transition:background .15s,color .15s}
+.chip:hover{background:var(--hover);color:var(--text)}
+.field{flex:1;min-width:0;box-sizing:border-box;height:44px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:15px}
+.field::placeholder{color:var(--muted)}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+a{color:var(--accent)}a:hover{color:var(--text)}
+</style>
+</helmet>
+<div class="{{appCls}}" style="min-height: 100vh; display: flex; flex-wrap: wrap; background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+
+<aside style="flex: 1 1 240px; max-width: 100%; box-sizing: border-box; padding: 28px 20px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 28px;">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 14px;">
+<div style="font-size: 20px; font-weight: 700;">Log Monitor</div>
+<button class="icon-btn" onClick="{{toggleTheme}}" aria-label="{{themeLabel}}" title="{{themeLabel}}">
+<sc-if value="{{isDark}}" hint-placeholder-val="{{true}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+</sc-if>
+<sc-if value="{{isLight}}" hint-placeholder-val="{{false}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+</sc-if>
+</button>
+</div>
+<nav aria-label="Main" style="display: flex; flex-direction: column; gap: 4px;">
+<sc-for list="{{nav}}" as="item" hint-placeholder-count="5">
+<button class="{{item.cls}}" onClick="{{item.pick}}"><span class="lbl">{{item.label}}</span></button>
+</sc-for>
+</nav>
+<div style="margin-top: auto; padding: 0 14px; display: flex; align-items: center; gap: 8px; font-size: 13px;" class="muted">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent);"></span>
+<span>Ingest live · 3 sources</span>
+</div>
+</aside>
+
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px;">
+
+<!-- ============ DASHBOARD ============ -->
+<sc-if value="{{isDash}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 24px; max-width: 1200px;">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+<div>
+<h1 style="margin: 0; font-size: 30px;">Dashboard</h1>
+<p style="margin: 6px 0 0;" class="muted">Last 24 hours · all environments</p>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap;">
+<button class="pill">1h</button><button class="pill active">24h</button><button class="pill">7d</button>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+<sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+<div class="card hov">
+<div style="font-size: 14px;" class="muted">{{k.label}}</div>
+<div style="font-size: 30px; font-weight: 700; margin-top: 8px;">{{k.value}}</div>
+<div style="font-size: 13px; margin-top: 6px;" class="{{k.cls}}">{{k.delta}}</div>
+</div>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+<div class="card">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 17px;">Errors per hour</h2>
+<span style="font-size: 13px;" class="muted">peak 14:00 · 412</span>
+</div>
+<div style="height: 180px; display: flex; align-items: flex-end; gap: 4px; margin-top: 20px; border-bottom: 1px solid var(--border);">
+<sc-for list="{{bars}}" as="b" hint-placeholder-count="24">
+<div class="bar" style="height: {{b.h}}px" title="{{b.t}}"></div>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 8px;" class="muted"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>now</span></div>
+</div>
+<div class="card">
+<h2 style="margin: 0 0 12px; font-size: 17px;">Top services by errors</h2>
+<sc-for list="{{services}}" as="s" hint-placeholder-count="5">
+<div class="row" style="display: grid; grid-template-columns: 1fr 2fr 56px; gap: 12px; align-items: center; padding: 10px 8px; border-radius: 6px;">
+<span class="mono">{{s.name}}</span>
+<div style="height: 6px; background: var(--surface2); border-radius: 3px;"><div style="height: 6px; width: {{s.pct}}%; background: var(--accent); border-radius: 3px;"></div></div>
+<span style="text-align: right; font-size: 14px;">{{s.count}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+<div class="card">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+<h2 style="margin: 0; font-size: 17px;">Recent alerts</h2>
+<button class="btn" onClick="{{goAlerts}}">View all</button>
+</div>
+<sc-for list="{{alertsTop}}" as="a" hint-placeholder-count="3">
+<div class="row" style="display: flex; gap: 12px; align-items: center; padding: 12px 8px; border-radius: 6px; border-top: 1px solid var(--border);">
+<span class="{{a.sevCls}}">{{a.sev}}</span>
+<span style="flex: 1;">{{a.title}}</span>
+<span style="font-size: 13px;" class="muted">{{a.time}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<!-- ============ LOGS ============ -->
+<sc-if value="{{isLogs}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 20px; max-width: 1200px;">
+<div>
+<h1 style="margin: 0; font-size: 30px;">Logs</h1>
+<p style="margin: 6px 0 0;" class="muted">Streaming from api-gateway, auth-service, payments, worker-queue</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+<input class="field" style="max-width: 420px;" placeholder="Search logs, e.g. service:payments timeout" aria-label="Search logs">
+<div style="display: flex; gap: 8px; flex-wrap: wrap;">
+<sc-for list="{{levels}}" as="l" hint-placeholder-count="4">
+<button class="{{l.cls}}" onClick="{{l.pick}}">{{l.label}}</button>
+</sc-for>
+</div>
+</div>
+<div class="card" style="padding: 0; overflow-x: auto;">
+<div style="min-width: 760px;">
+<div style="display: grid; grid-template-columns: 110px 80px 150px 1fr; gap: 16px; padding: 12px 20px; font-size: 13px; border-bottom: 1px solid var(--border);" class="muted">
+<span>Time</span><span>Level</span><span>Service</span><span>Message</span>
+</div>
+<sc-for list="{{logs}}" as="r" hint-placeholder-count="8">
+<div class="row" style="display: grid; grid-template-columns: 110px 80px 150px 1fr; gap: 16px; padding: 11px 20px; align-items: center; border-bottom: 1px solid var(--border);">
+<span class="mono muted">{{r.time}}</span>
+<span><span class="{{r.cls}}">{{r.level}}</span></span>
+<span class="mono">{{r.service}}</span>
+<span class="mono" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{r.msg}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="font-size: 13px;" class="muted">Showing {{logCount}} of 48,213 entries · auto-refresh every 5 s</div>
+</div>
+</sc-if>
+
+<!-- ============ ALERTS ============ -->
+<sc-if value="{{isAlerts}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 20px; max-width: 1200px;">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+<div>
+<h1 style="margin: 0; font-size: 30px;">Alerts</h1>
+<p style="margin: 6px 0 0;" class="muted">{{openCount}} open · rules evaluated every minute</p>
+</div>
+<button class="btn primary">New alert rule</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px;">
+<sc-for list="{{alerts}}" as="a" hint-placeholder-count="5">
+<div class="card hov" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+<span class="{{a.sevCls}}">{{a.sev}}</span>
+<div style="flex: 1 1 280px; min-width: 0;">
+<div style="font-weight: 600;">{{a.title}}</div>
+<div style="font-size: 14px; margin-top: 4px;" class="muted">{{a.service}} · {{a.rule}} · {{a.time}}</div>
+</div>
+<span style="font-size: 14px;" class="{{a.statusCls}}">{{a.status}}</span>
+<sc-if value="{{a.isOpen}}" hint-placeholder-val="{{true}}">
+<button class="btn" onClick="{{a.ack}}">Acknowledge</button>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<!-- ============ REPORTS ============ -->
+<sc-if value="{{isReports}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 20px; max-width: 1200px;">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+<div>
+<h1 style="margin: 0; font-size: 30px;">Reports</h1>
+<p style="margin: 6px 0 0;" class="muted">Scheduled and on-demand exports</p>
+</div>
+<button class="btn primary" onClick="{{genReport}}">Generate report</button>
+</div>
+<sc-if value="{{reportMsg}}" hint-placeholder-val="{{false}}">
+<div class="card" style="border-color: var(--accent); background: var(--accent-soft);">Report “Ad-hoc · last 24h” is being generated. It will appear below in a minute.</div>
+</sc-if>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+<sc-for list="{{reports}}" as="r" hint-placeholder-count="4">
+<div class="card hov" style="display: flex; flex-direction: column; gap: 10px;">
+<div style="font-size: 13px;" class="muted">{{r.schedule}}</div>
+<div style="font-weight: 600; font-size: 17px;">{{r.name}}</div>
+<div style="font-size: 14px; line-height: 1.5;" class="muted">{{r.desc}}</div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 8px;">
+<span style="font-size: 13px;" class="muted">Last: {{r.last}}</span>
+<button class="btn">Download PDF</button>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<!-- ============ AI ANALYSIS ============ -->
+<sc-if value="{{isAi}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 28px; max-width: 1200px;">
+<div role="tablist" aria-label="AI Analysis" style="display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--border);">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+<button class="{{t.cls}}" role="tab" onClick="{{t.pick}}"><span class="lbl">{{t.label}}</span></button>
+</sc-for>
+</div>
+
+<!-- Summaries -->
+<sc-if value="{{tSum}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 20px;">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+<div>
+<h1 style="margin: 0; font-size: 30px;">Summaries</h1>
+<p style="margin: 6px 0 0;" class="muted">AI-written digests of what happened in your logs · {{sumStamp}}</p>
+</div>
+<button class="btn primary" onClick="{{regen}}">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"></path><path d="M21 3v6h-6"></path></svg>
+Regenerate
+</button>
+</div>
+<sc-for list="{{summaries}}" as="s" hint-placeholder-count="3">
+<div class="card hov">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: center;">
+<h2 style="margin: 0; font-size: 18px;">{{s.period}}</h2>
+<span class="{{s.cls}}">{{s.health}}</span>
+</div>
+<p style="margin: 12px 0; line-height: 1.6;">{{s.text}}</p>
+<ul style="margin: 0; padding-left: 20px; line-height: 1.8;" class="muted">
+<sc-for list="{{s.points}}" as="p" hint-placeholder-count="3"><li>{{p}}</li></sc-for>
+</ul>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<!-- Anomalies -->
+<sc-if value="{{tAno}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 20px;">
+<div>
+<h1 style="margin: 0; font-size: 30px;">Anomalies</h1>
+<p style="margin: 6px 0 0;" class="muted">Deviations from the 14-day baseline, ranked by score</p>
+</div>
+<div class="card" style="padding: 0; overflow-x: auto;">
+<div style="min-width: 720px;">
+<div style="display: grid; grid-template-columns: 1.6fr 1fr 160px 90px 110px; gap: 16px; padding: 12px 20px; font-size: 13px; border-bottom: 1px solid var(--border);" class="muted">
+<span>Signal</span><span>Service</span><span>Score</span><span>Detected</span><span></span>
+</div>
+<sc-for list="{{anomalies}}" as="a" hint-placeholder-count="5">
+<div class="row" style="display: grid; grid-template-columns: 1.6fr 1fr 160px 90px 110px; gap: 16px; padding: 14px 20px; align-items: center; border-bottom: 1px solid var(--border);">
+<div>
+<div style="font-weight: 600;">{{a.signal}}</div>
+<div style="font-size: 13px; margin-top: 3px;" class="muted">{{a.desc}}</div>
+</div>
+<span class="mono">{{a.service}}</span>
+<div style="display: flex; align-items: center; gap: 8px;">
+<div style="flex: 1; height: 6px; background: var(--surface2); border-radius: 3px;"><div style="height: 6px; width: {{a.score}}%; background: var(--accent); border-radius: 3px;"></div></div>
+<span style="font-size: 13px; width: 28px;">{{a.score}}</span>
+</div>
+<span style="font-size: 13px;" class="muted">{{a.time}}</span>
+<button class="btn" onClick="{{a.investigate}}">Investigate</button>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+
+<!-- Root Cause -->
+<sc-if value="{{tRoot}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 20px;">
+<div>
+<h1 style="margin: 0; font-size: 30px;">Root Cause</h1>
+<p style="margin: 6px 0 0;" class="muted">Pick an incident to see the reconstructed chain of events</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px;">
+<sc-for list="{{incidents}}" as="i" hint-placeholder-count="3">
+<button class="{{i.cls}}" onClick="{{i.pick}}">{{i.label}}</button>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+<div class="card">
+<h2 style="margin: 0 0 16px; font-size: 17px;">Timeline</h2>
+<sc-for list="{{inc.steps}}" as="st" hint-placeholder-count="4">
+<div style="display: flex; gap: 14px;">
+<div style="display: flex; flex-direction: column; align-items: center;">
+<span style="width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--accent); margin-top: 5px;"></span>
+<span style="flex: 1; width: 2px; background: var(--border); margin: 4px 0;"></span>
+</div>
+<div style="padding-bottom: 18px;">
+<div class="mono muted">{{st.time}} · {{st.service}}</div>
+<div style="margin-top: 4px; line-height: 1.5;">{{st.text}}</div>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 16px;">
+<div class="card" style="border-color: var(--accent);">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+<h2 style="margin: 0; font-size: 17px;">Probable cause</h2>
+<span class="badge ok">{{inc.conf}} confidence</span>
+</div>
+<p style="margin: 12px 0 0; line-height: 1.6;">{{inc.cause}}</p>
+</div>
+<div class="card">
+<h2 style="margin: 0 0 10px; font-size: 17px;">Suggested fix</h2>
+<ol style="margin: 0; padding-left: 20px; line-height: 1.8;" class="muted">
+<sc-for list="{{inc.fix}}" as="f" hint-placeholder-count="3"><li>{{f}}</li></sc-for>
+</ol>
+<div style="display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap;">
+<button class="btn primary" onClick="{{askAboutIncident}}">Ask Assistant</button>
+<button class="btn">Create ticket</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<!-- Assistant -->
+<sc-if value="{{tAsk}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 20px;">
+<div>
+<h1 style="margin: 0; font-size: 30px;">Assistant</h1>
+<p style="margin: 6px 0 0;" class="muted">Ask questions about your logs in plain language</p>
+</div>
+<div class="card" style="display: flex; flex-direction: column; gap: 16px; min-height: 420px;">
+<div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
+<sc-for list="{{messages}}" as="m" hint-placeholder-count="2">
+<div class="{{m.cls}}" style="white-space: pre-line;">{{m.text}}</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px;">
+<sc-for list="{{suggestions}}" as="q" hint-placeholder-count="3">
+<button class="chip" onClick="{{q.ask}}">{{q.text}}</button>
+</sc-for>
+</div>
+<div style="display: flex; gap: 8px;">
+<input class="field" value="{{draft}}" onChange="{{onDraft}}" onKeyDown="{{onKey}}" placeholder="e.g. Why did checkout fail at 14:05?" aria-label="Message">
+<button class="btn primary" onClick="{{send}}">Send</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</sc-if>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { page: 'ai', tab: 'summaries', theme: 'dark', level: 'all', acked: {}, reportMsg: false, regenCount: 0, incident: 0, draft: '', messages: [
+      { role: 'bot', text: 'Hi! I have access to the last 7 days of logs from 4 services. What would you like to know?' }
+    ] };
+  }
+  answerFor(q) {
+    const a = {
+      'Why did checkout fail at 14:05?': 'Between 14:02 and 14:19, payments returned 503 on 38% of /checkout requests.\nThe trigger was the Postgres connection pool hitting its limit (max 50) after worker-queue scaled to 12 replicas. See Root Cause → INC-2041.',
+      'Summarize errors in the last hour': '1,204 errors in the last hour, 71% from payments (timeouts to db-primary). auth-service is stable; api-gateway shows a small rise in 429s from one client.',
+      'Which service is the noisiest today?': 'worker-queue — 18.4k log lines/hour, 3× its baseline, mostly retry messages for job type "invoice.render".'
+    };
+    return a[q] || 'Searching logs for "' + q + '"… Found 37 matching entries across 2 services. The most frequent pattern is "upstream timeout after 5000ms" in payments.';
+  }
+  ask(q) {
+    if (!q || !q.trim()) return;
+    this.setState({ draft: '', messages: this.state.messages.concat([{ role: 'user', text: q }, { role: 'bot', text: this.answerFor(q) }]) });
+  }
+  renderVals() {
+    const s = this.state;
+    const go = (p) => () => this.setState({ page: p });
+    const navDef = [['dashboard','Dashboard'],['logs','Logs'],['alerts','Alerts'],['reports','Reports'],['ai','AI Analysis']];
+    const nav = navDef.map(([id, label]) => ({ label, cls: 'nav-item' + (s.page === id ? ' active' : ''), pick: go(id) }));
+    const tabDef = [['summaries','Summaries'],['anomalies','Anomalies'],['root','Root Cause'],['assistant','Assistant']];
+    const tabs = tabDef.map(([id, label]) => ({ label, cls: 'tab' + (s.tab === id ? ' active' : ''), pick: () => this.setState({ tab: id }) }));
+
+    const sevCls = { Critical: 'badge err', Warning: 'badge warn', Info: 'badge info' };
+    const alertDef = [
+      { id: 1, sev: 'Critical', title: 'payments: 5xx rate above 5% for 10 min', service: 'payments', rule: 'error-rate > 5%', time: '12 min ago' },
+      { id: 2, sev: 'Warning', title: 'db-primary: connection pool at 96%', service: 'postgres', rule: 'pool usage > 90%', time: '18 min ago' },
+      { id: 3, sev: 'Warning', title: 'worker-queue: backlog over 5,000 jobs', service: 'worker-queue', rule: 'queue depth > 5k', time: '41 min ago' },
+      { id: 4, sev: 'Info', title: 'api-gateway: unusual 429 volume from one client', service: 'api-gateway', rule: 'anomaly score > 70', time: '1 h ago' },
+      { id: 5, sev: 'Critical', title: 'auth-service: login latency p95 above 2 s', service: 'auth-service', rule: 'p95 > 2000 ms', time: '3 h ago', resolved: true }
+    ];
+    const alerts = alertDef.map((a) => {
+      const acked = !!s.acked[a.id];
+      const status = a.resolved ? 'Resolved' : (acked ? 'Acknowledged' : 'Open');
+      return { ...a, sevCls: sevCls[a.sev], status, statusCls: status === 'Open' ? 'err' : (status === 'Resolved' ? 'ok' : 'muted'), isOpen: status === 'Open',
+        ack: () => this.setState({ acked: { ...s.acked, [a.id]: true } }) };
+    });
+
+    const logDef = [
+      ['14:05:12.381','ERROR','payments','POST /checkout 503 upstream timeout after 5000ms (db-primary)'],
+      ['14:05:12.097','WARN','postgres','connection pool usage 48/50, waiting clients: 17'],
+      ['14:05:11.840','INFO','api-gateway','GET /v1/orders 200 42ms user=8f21'],
+      ['14:05:11.502','ERROR','payments','charge failed: context deadline exceeded order=ORD-99812'],
+      ['14:05:10.977','WARN','worker-queue','retrying job invoice.render attempt=3/5'],
+      ['14:05:10.415','INFO','auth-service','token refreshed client=web session=a91c'],
+      ['14:05:09.990','INFO','worker-queue','scaled replicas 8 → 12 (queue depth 5,240)'],
+      ['14:05:09.311','WARN','api-gateway','rate limit hit client=partner-acme 429'],
+      ['14:05:08.764','ERROR','worker-queue','invoice.render failed: pdf renderer OOM (512Mi)'],
+      ['14:05:08.120','INFO','payments','POST /refund 200 118ms']
+    ];
+    const lvlCls = { ERROR: 'badge err', WARN: 'badge warn', INFO: 'badge info' };
+    const logs = logDef.filter((r) => s.level === 'all' || r[1] === s.level)
+      .map((r) => ({ time: r[0], level: r[1], service: r[2], msg: r[3], cls: lvlCls[r[1]] }));
+    const levels = [['all','All'],['ERROR','Errors'],['WARN','Warnings'],['INFO','Info']]
+      .map(([id, label]) => ({ label, cls: 'pill' + (s.level === id ? ' active' : ''), pick: () => this.setState({ level: id }) }));
+
+    const heights = [22,18,15,12,10,12,20,34,48,62,70,88,104,132,160,118,96,84,72,64,50,40,34,28];
+    const bars = heights.map((h, i) => ({ h, t: String(i).padStart(2, '0') + ':00' }));
+
+    const incDef = [
+      { label: 'INC-2041 · Checkout 503s', conf: '87%',
+        cause: 'worker-queue autoscaled from 8 to 12 replicas; each replica opens 4 DB connections, exhausting the Postgres pool (max 50). payments could not get a connection and timed out after 5 s.',
+        steps: [
+          { time: '14:01:47', service: 'worker-queue', text: 'Backlog passes 5,000 jobs (invoice.render retries).' },
+          { time: '14:02:03', service: 'worker-queue', text: 'Autoscaler adds 4 replicas, +16 DB connections.' },
+          { time: '14:02:20', service: 'postgres', text: 'Connection pool reaches 50/50; clients start queueing.' },
+          { time: '14:02:41', service: 'payments', text: 'First upstream timeouts on POST /checkout → 503.' }
+        ],
+        fix: ['Cap worker-queue DB connections with a per-replica pool of 2.', 'Raise Postgres max_connections or add PgBouncer in front of db-primary.', 'Give invoice.render 1Gi memory to stop the OOM retry loop.'] },
+      { label: 'INC-2038 · Slow logins', conf: '74%',
+        cause: 'A new release of auth-service disabled the session cache, so every login hit the users table directly and p95 latency rose above 2 s.',
+        steps: [
+          { time: '10:14:00', service: 'deploy', text: 'auth-service v3.8.0 rolled out to production.' },
+          { time: '10:16:32', service: 'auth-service', text: 'Cache hit ratio drops from 94% to 0%.' },
+          { time: '10:21:10', service: 'auth-service', text: 'Login p95 exceeds 2,000 ms; alert fires.' }
+        ],
+        fix: ['Re-enable SESSION_CACHE in the v3.8.x config.', 'Add a cache-hit-ratio alert below 60%.'] },
+      { label: 'INC-2032 · 429 burst', conf: '62%',
+        cause: 'Client partner-acme started a bulk sync without backoff, exceeding its 600 req/min quota.',
+        steps: [
+          { time: '08:00:02', service: 'api-gateway', text: 'Request rate from partner-acme jumps 9×.' },
+          { time: '08:00:40', service: 'api-gateway', text: 'Rate limiter returns 429 to 71% of its requests.' }
+        ],
+        fix: ['Contact partner-acme about retry backoff.', 'Offer a bulk export endpoint for nightly syncs.'] }
+    ];
+    const incidents = incDef.map((i, idx) => ({ label: i.label, cls: 'pill' + (s.incident === idx ? ' active' : ''), pick: () => this.setState({ incident: idx }) }));
+
+    const anomalies = [
+      { signal: 'Error rate spike', desc: '5xx 9.4× above baseline on /checkout', service: 'payments', score: 96, time: '14:02', inc: 0 },
+      { signal: 'Connection saturation', desc: 'Pool usage 100% for 17 min', service: 'postgres', score: 91, time: '14:02', inc: 0 },
+      { signal: 'Log volume surge', desc: '3× more lines/hour, mostly retries', service: 'worker-queue', score: 78, time: '13:58', inc: 0 },
+      { signal: 'Latency shift', desc: 'Login p95 from 340 ms to 2.1 s', service: 'auth-service', score: 72, time: '10:21', inc: 1 },
+      { signal: 'New error signature', desc: '"pdf renderer OOM" first seen today', service: 'worker-queue', score: 64, time: '09:47', inc: 0 }
+    ].map((a) => ({ ...a, investigate: () => this.setState({ tab: 'root', incident: a.inc }) }));
+
+    const summaries = [
+      { period: 'Last hour', health: 'Degraded', cls: 'badge warn', text: 'Checkout reliability dropped between 14:02 and 14:19 because the database ran out of connections. Everything else ran within normal ranges.',
+        points: ['1,204 errors, 71% from payments', 'Root cause linked to worker-queue autoscaling (INC-2041)', 'Error rate back under 1% since 14:20'] },
+      { period: 'Last 24 hours', health: 'Stable', cls: 'badge ok', text: 'Two incidents, both mitigated. Log volume was 18% above the weekly average, driven by invoice rendering retries.',
+        points: ['48.2k entries ingested per hour on average', 'Slow logins 10:14–10:52 after auth-service v3.8.0', 'No new security-relevant events'] },
+      { period: 'Last 7 days', health: 'Stable', cls: 'badge ok', text: 'Error rate trended down 12% week over week. worker-queue remains the noisiest service and the most frequent incident trigger.',
+        points: ['5 incidents, median time to resolve 23 min', 'Top recurring signature: upstream timeout after 5000ms', 'Consider a memory bump for invoice.render'] }
+    ];
+
+    const suggestions = ['Why did checkout fail at 14:05?', 'Summarize errors in the last hour', 'Which service is the noisiest today?']
+      .map((t) => ({ text: t, ask: () => this.ask(t) }));
+    const messages = s.messages.map((m) => ({ text: m.text, cls: 'msg ' + m.role }));
+    const openCount = alerts.filter((a) => a.isOpen).length;
+
+    return {
+      appCls: 'app' + (s.theme === 'light' ? ' light' : ''),
+      isDark: s.theme === 'dark', isLight: s.theme === 'light',
+      themeLabel: s.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme',
+      toggleTheme: () => this.setState({ theme: s.theme === 'dark' ? 'light' : 'dark' }),
+      nav, tabs,
+      isDash: s.page === 'dashboard', isLogs: s.page === 'logs', isAlerts: s.page === 'alerts', isReports: s.page === 'reports', isAi: s.page === 'ai',
+      tSum: s.tab === 'summaries', tAno: s.tab === 'anomalies', tRoot: s.tab === 'root', tAsk: s.tab === 'assistant',
+      kpis: [
+        { label: 'Log entries (24h)', value: '1.16M', delta: '+18% vs yesterday', cls: 'muted' },
+        { label: 'Error rate', value: '0.84%', delta: '−0.3 pp vs yesterday', cls: 'ok' },
+        { label: 'Open alerts', value: String(openCount), delta: '2 critical', cls: 'err' },
+        { label: 'Services reporting', value: '4 / 4', delta: 'all healthy ingest', cls: 'ok' }
+      ],
+      bars,
+      services: [
+        { name: 'payments', count: '2,931', pct: 100 },
+        { name: 'worker-queue', count: '1,874', pct: 64 },
+        { name: 'api-gateway', count: '612', pct: 21 },
+        { name: 'auth-service', count: '388', pct: 13 },
+        { name: 'postgres', count: '205', pct: 7 }
+      ],
+      alerts, alertsTop: alerts.filter((a) => a.isOpen).slice(0, 3), openCount,
+      goAlerts: go('alerts'),
+      logs, levels, logCount: logs.length,
+      reports: [
+        { name: 'Daily health digest', schedule: 'Every day · 08:00', desc: 'Error rates, top incidents and AI summary for all services.', last: 'today 08:00' },
+        { name: 'Weekly SLA report', schedule: 'Mondays · 09:00', desc: 'Availability and latency per service against SLO targets.', last: 'Nov 2' },
+        { name: 'Security events', schedule: 'Every day · 07:00', desc: 'Failed logins, token anomalies and permission changes.', last: 'today 07:00' },
+        { name: 'Monthly cost & volume', schedule: '1st of month', desc: 'Log volume per source and storage cost trend.', last: 'Nov 1' }
+      ],
+      reportMsg: s.reportMsg, genReport: () => this.setState({ reportMsg: true }),
+      summaries, sumStamp: s.regenCount ? 'regenerated just now' : 'updated 4 min ago',
+      regen: () => this.setState({ regenCount: s.regenCount + 1 }),
+      anomalies, incidents, inc: incDef[s.incident],
+      askAboutIncident: () => { this.setState({ tab: 'assistant' }); this.ask('Why did checkout fail at 14:05?'); },
+      messages, suggestions, draft: s.draft,
+      onDraft: (e) => this.setState({ draft: e.target.value }),
+      onKey: (e) => { if (e.key === 'Enter') this.ask(s.draft); },
+      send: () => this.ask(s.draft)
+    };
+  }
+}
+</script>
+</body>
+</html>

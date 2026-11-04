@@ -1,18 +1,17 @@
 import { Outlet } from 'react-router';
 import { Sidebar } from './Sidebar';
 
-/**
- * Desktop (lg+): fixed 240px sidebar on the left, separated by a 1px border.
- * Mobile/tablet: the sidebar becomes a top bar with a horizontal nav row.
- */
+/** A wrapping row: the sidebar sits on the left and stacks above the content on phones. */
 export function AppLayout() {
   return (
-    <div className="min-h-screen bg-background text-text-primary">
-      <aside className="border-b border-border lg:fixed lg:inset-y-0 lg:left-0 lg:w-60 lg:border-r lg:border-b-0">
+    <div className="flex min-h-screen flex-wrap bg-bg text-text">
+      <aside className="max-w-full flex-[1_1_240px] border-r border-border px-5 py-7">
         <Sidebar />
       </aside>
-      <main className="p-4 sm:p-6 lg:ml-60">
-        <Outlet />
+      <main className="min-w-0 flex-[999_1_560px] px-4 pt-8 pb-12 sm:px-10">
+        <div className="max-w-[1200px]">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

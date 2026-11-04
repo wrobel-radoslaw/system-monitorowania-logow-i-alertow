@@ -3,5 +3,5 @@ type EmptyStateProps = {
 };
 
 export function EmptyState({ message = 'No data yet' }: EmptyStateProps) {
-  return <p className="text-text-muted">{message}</p>;
+  return <p className="text-muted">{message}</p>;
 }

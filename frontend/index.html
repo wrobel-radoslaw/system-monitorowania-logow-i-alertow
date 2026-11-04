@@ -5,16 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Log Monitor</title>
     <script>
-      // Apply the saved (or system) theme before first paint to avoid a flash.
+      // Apply the saved theme before first paint to avoid a flash. The default is dark.
       (function () {
         var theme;
         try {
           theme = localStorage.getItem('theme');
         } catch (e) {}
-        if (theme !== 'light' && theme !== 'dark') {
-          theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-        }
-        document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
       })();
     </script>
   </head>
