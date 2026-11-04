@@ -1,0 +1,1 @@
+export { logsRoutes } from './routes';

@@ -1,0 +1,60 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Only these colors exist: the default Tailwind palette is removed.
+ * Dark is the default theme; the light theme overrides the same variables below.
+ */
+@theme {
+  --color-*: initial;
+  --color-background: #000000;
+  --color-text-primary: #ffffff;
+  --color-text-muted: #a1a1a1;
+  --color-accent: #089925;
+  --color-border: #1f1f1f;
+  --color-severity-critical: #dc2626;
+  --color-severity-warning: #eab308;
+  --color-severity-info: #a1a1a1;
+
+  --font-sans:
+    system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+
+  /* No rounded corners, shadows or animations anywhere. */
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --animate-*: initial;
+}
+
+[data-theme='light'] {
+  --color-background: #ffffff;
+  --color-text-primary: #000000;
+  --color-text-muted: #525252;
+  --color-border: #e5e5e5;
+  --color-severity-info: #525252;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  html[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+  }
+}

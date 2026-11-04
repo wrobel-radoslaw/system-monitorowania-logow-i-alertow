@@ -1,0 +1,3 @@
+# The root .gitignore ignores every "logs/" directory (runtime logs).
+# The Logs feature slice is source code, so re-include it.
+!src/features/logs/
