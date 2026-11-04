@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-ENV_KEYS = {"POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_PORT"}
+ENV_KEYS = {"POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_PORT", "API_PORT"}
 IGNORED_DIRS = {
     ".git", "__pycache__", ".pytest_cache", ".venv", "venv", "node_modules",
     "bin", "obj", "dist", "coverage", "TestResults",
@@ -158,7 +158,7 @@ class ComposeTests(unittest.TestCase):
         self.assertEqual(set(self.env), ENV_KEYS)
         for variable in self.env:
             self.assertIn("${" + variable, self.compose, variable)
-        for name in ("POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PORT"):
+        for name in ("POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PORT", "API_PORT"):
             self.assertIn(self.env[name], self.compose)
 
     def test_compose_only_builds_components_that_exist(self):
@@ -167,7 +167,16 @@ class ComposeTests(unittest.TestCase):
             dockerfile = ROOT / component_dir / "Dockerfile"
             if defined:
                 self.assertTrue(dockerfile.is_file(), f"{service} requires {dockerfile.relative_to(ROOT)}")
-                self.assertIn(f"context: ./{component_dir}", self.compose)
+                block = re.search(r"(?ms)^  " + re.escape(service) + r":\r?\n(.*?)(?=^  \S|^\S|\Z)", self.compose).group(1)
+                own_context = re.search(r"(?m)^\s+context:\s*\./" + re.escape(component_dir) + r"\s*$", block) is not None
+                root_context = (
+                    re.search(r"(?m)^\s+context:\s*\.\s*$", block) is not None
+                    and re.search(r"(?m)^\s+dockerfile:\s*" + re.escape(component_dir) + r"/Dockerfile\s*$", block) is not None
+                )
+                self.assertTrue(
+                    own_context or root_context,
+                    f"{service} must build {component_dir}/Dockerfile (context ./{component_dir}, or context . with dockerfile: {component_dir}/Dockerfile)",
+                )
             elif dockerfile.is_file():
                 self.fail(f"{dockerfile.relative_to(ROOT)} exists but Compose has no {service} service")
 
@@ -235,8 +244,8 @@ class DocumentationTests(unittest.TestCase):
             self.assertNotIn("pozostaje niepotwierdzona", readme)
     def test_compose_stage_and_api_dependency_are_documented(self):
         readme = read_text("README.md")
-        self.assertIn("Compose uruchamia bazę danych", readme)
-        self.assertIn("po dostarczeniu kodu i Dockerfile", readme)
+        self.assertIn("Compose uruchamia PostgreSQL i API", readme)
+        self.assertIn("rzeczywistej aplikacji i jej Dockerfile", readme)
         self.assertIn("GET /api/health", readme)
         self.assertIn("503", readme)
 
