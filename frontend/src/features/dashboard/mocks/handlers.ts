@@ -1,6 +1,4 @@
-import { http, HttpResponse, type AnyHandler } from 'msw';
+import type { AnyHandler } from 'msw';
 
-/** GET /api/health. The Dashboard's event requests are mocked in the Logs slice. */
-export const handlers: AnyHandler[] = [
-  http.get('*/api/health', () => HttpResponse.json({ status: 'healthy', database: 'connected' })),
-];
+/** MSW handlers for the Dashboard slice. Add mocks here once the API contract is known. */
+export const handlers: AnyHandler[] = [];

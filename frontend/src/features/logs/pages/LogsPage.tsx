@@ -1,13 +1,15 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router';
-import { eventsQueryOptions } from '@/shared/lib/events-api';
+import { eventsQueryOptions } from '../api/events-api';
+import { Button } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { Input } from '@/shared/ui/Input';
 import { Loading } from '@/shared/ui/Loading';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Pill } from '@/shared/ui/Pill';
+import { PillGroup } from '@/shared/ui/PillGroup';
 import { EventFilters } from '../components/EventFilters';
 import { EventTable } from '../components/EventTable';
 import { Pagination } from '../components/Pagination';
@@ -15,9 +17,10 @@ import { readFilters, readPage, toEventQuery, type FilterValues } from '../filte
 
 const REFRESH_MS = 5_000;
 
-// The API takes one severity at a time, so "Errors" means ERROR. CRITICAL events show under "All".
+// The API takes one severity per request, so each pill is one level.
 const levels = [
   { value: '', label: 'All' },
+  { value: 'CRITICAL', label: 'Critical' },
   { value: 'ERROR', label: 'Errors' },
   { value: 'WARN', label: 'Warnings' },
   { value: 'INFO', label: 'Info' },
@@ -49,6 +52,12 @@ export function LogsPage() {
     setSearchParams(next, { replace: true });
   }
 
+  const hasFilters = Object.values(filters).some(Boolean);
+
+  function clearFilters() {
+    setSearchParams({}, { replace: true });
+  }
+
   function changePage(nextPage: number) {
     const next = new URLSearchParams(searchParams);
     next.set('page', String(nextPage));
@@ -62,7 +71,16 @@ export function LogsPage() {
       <>
         {data.items.length > 0 ? (
           <EventTable events={data.items} />
+        ) : hasFilters ? (
+          <EmptyState
+            message="No events match these filters"
+            hint="Try a wider time range or another machine, level or status."
+            action={<Button onClick={clearFilters}>Clear filters</Button>}
+          />
+        ) : data.totalCount === 0 ? (
+          <EmptyState message="No events yet" />
         ) : (
+          // A page past the last one, e.g. from an old link. Pagination below leads back.
           <EmptyState message="No events match these filters" />
         )}
         {data.totalCount > 0 && (
@@ -100,7 +118,7 @@ export function LogsPage() {
               className="w-full max-w-[420px]"
             />
           )}
-          <div role="group" aria-label="Level" className="flex flex-wrap gap-2">
+          <PillGroup label="Level">
             {levels.map((level) => (
               <Pill
                 key={level.label}
@@ -113,13 +131,13 @@ export function LogsPage() {
             <Pill active={moreOpen} onClick={() => setMoreOpen((open) => !open)}>
               More filters
             </Pill>
-          </div>
+          </PillGroup>
         </div>
         {moreOpen && (
           <EventFilters
             filters={filters}
             onChange={changeFilter}
-            onClear={() => setSearchParams({}, { replace: true })}
+            onClear={clearFilters}
           />
         )}
         {renderResults()}

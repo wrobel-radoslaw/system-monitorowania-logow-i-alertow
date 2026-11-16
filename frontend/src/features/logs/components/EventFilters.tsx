@@ -1,4 +1,4 @@
-import { EVENT_STATUSES, MACHINE_IDS } from '@/shared/types/events';
+import { EVENT_STATUSES, MACHINE_IDS } from '../types';
 import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import type { FilterValues } from '../filters';

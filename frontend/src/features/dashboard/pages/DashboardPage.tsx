@@ -3,8 +3,10 @@ import { alertSeverityTone, fakeAlerts } from '@/shared/mocks/fake-alerts';
 import { Badge } from '@/shared/ui/Badge';
 import { LinkButton } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
+import { CardTitle } from '@/shared/ui/CardTitle';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Pill } from '@/shared/ui/Pill';
+import { PillGroup } from '@/shared/ui/PillGroup';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import {
   DEFAULT_RANGE,
@@ -12,7 +14,7 @@ import {
   dashboardData,
   type DashboardData,
   type RangeId,
-} from '../fake-data';
+} from '../mocks/fake-data';
 
 const RECENT_ALERTS = 3;
 
@@ -26,7 +28,7 @@ function ErrorsChart({ chart }: { chart: DashboardData['chart'] }) {
   return (
     <Card>
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-[17px] font-bold">{chart.title}</h2>
+        <CardTitle>{chart.title}</CardTitle>
         <span className="text-[13px] text-muted">{chart.peak}</span>
       </div>
       <div
@@ -55,7 +57,7 @@ function ErrorsChart({ chart }: { chart: DashboardData['chart'] }) {
 function TopServices({ services }: { services: DashboardData['services'] }) {
   return (
     <Card>
-      <h2 className="mb-3 text-[17px] font-bold">Top services by errors</h2>
+      <CardTitle className="mb-3">Top services by errors</CardTitle>
       {services.map((service) => (
         <div
           key={service.name}
@@ -76,7 +78,7 @@ function RecentAlerts() {
   return (
     <Card>
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-[17px] font-bold">Recent alerts</h2>
+        <CardTitle>Recent alerts</CardTitle>
         <LinkButton to="/alerts">View all</LinkButton>
       </div>
       <ul>
@@ -105,18 +107,18 @@ export function DashboardPage() {
         title="Dashboard"
         subtitle={data.subtitle}
         actions={
-          <div role="group" aria-label="Time range" className="flex flex-wrap gap-2">
+          <PillGroup label="Time range">
             {RANGES.map((id) => (
               <Pill key={id} active={id === range} onClick={() => setRange(id)}>
                 {id}
               </Pill>
             ))}
-          </div>
+          </PillGroup>
         }
       />
 
       <div className="flex flex-col gap-6">
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] md:gap-4">
           {data.kpis.map((kpi) => (
             <Card key={kpi.label} hoverable>
               <div className="text-sm text-muted">{kpi.label}</div>

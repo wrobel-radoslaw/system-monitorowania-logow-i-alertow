@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { renderWithProviders } from '@/shared/test/render';
-import { ASSISTANT_GREETING } from '../fake-data';
+import { ASSISTANT_GREETING } from '../mocks/fake-data';
 import { AssistantPage } from './AssistantPage';
 
 describe('AssistantPage', () => {

@@ -16,7 +16,7 @@ describe('Sidebar', () => {
       mainNav()
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual(['Dashboard', 'Logs', 'Alerts', 'Raports', 'AI Analysis']);
+    ).toEqual(['Dashboard', 'Logs', 'Alerts', 'Reports', 'AI Analysis']);
   });
 
   it('marks the active item with aria-current="page"', () => {

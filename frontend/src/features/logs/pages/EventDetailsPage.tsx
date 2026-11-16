@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
+import { backToLogsPath } from '../details-link';
 import { ApiError } from '@/shared/lib/api-client';
-import { eventQueryOptions } from '@/shared/lib/events-api';
+import { eventQueryOptions } from '../api/events-api';
 import { formatTimestamp } from '@/shared/lib/format';
-import type { EventDto } from '@/shared/types/events';
+import type { EventDto } from '../types';
 import { LinkButton } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -11,16 +12,18 @@ import { ErrorState } from '@/shared/ui/ErrorState';
 import { Loading } from '@/shared/ui/Loading';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { SeverityBadge } from '../components/SeverityBadge';
+import { StatusActions } from '../components/StatusActions';
+import { StatusBadge } from '../components/StatusBadge';
 
 function EventFields({ event }: { event: EventDto }) {
   const fields = [
     { label: 'Event ID', value: <span className="font-mono text-[13px]">{event.eventId}</span> },
     { label: 'Time', value: formatTimestamp(event.timestamp) },
-    { label: 'Service', value: <span className="font-mono text-[13px]">{event.machineId}</span> },
+    { label: 'Machine', value: <span className="font-mono text-[13px]">{event.machineId}</span> },
     { label: 'Level', value: <SeverityBadge severity={event.severity} /> },
     { label: 'Code', value: <span className="font-mono text-[13px]">{event.code}</span> },
     { label: 'Message', value: <span className="font-mono text-[13px]">{event.message}</span> },
-    { label: 'Status', value: event.status },
+    { label: 'Status', value: <StatusBadge status={event.status} /> },
   ];
 
   return (
@@ -40,6 +43,8 @@ function EventFields({ event }: { event: EventDto }) {
 export function EventDetailsPage() {
   const { eventId = '' } = useParams();
   const { data, error, isPending } = useQuery(eventQueryOptions(eventId));
+  // Back to the list the user came from, with its filters and page.
+  const backTo = backToLogsPath(useLocation().state);
 
   function renderContent() {
     if (error instanceof ApiError && error.status === 404) {
@@ -47,14 +52,19 @@ export function EventDetailsPage() {
     }
     if (error) return <ErrorState error={error} />;
     if (isPending) return <Loading />;
-    return <EventFields event={data} />;
+    return (
+      <div className="flex flex-col gap-4">
+        <EventFields event={data} />
+        <StatusActions event={data} />
+      </div>
+    );
   }
 
   return (
     <>
       <PageHeader
         title="Event details"
-        actions={<LinkButton to="/logs">Back to logs</LinkButton>}
+        actions={<LinkButton to={backTo}>Back to logs</LinkButton>}
       />
       {renderContent()}
     </>

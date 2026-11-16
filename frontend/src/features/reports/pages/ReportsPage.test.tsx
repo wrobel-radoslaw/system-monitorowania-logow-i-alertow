@@ -1,13 +1,13 @@
 import { screen } from '@testing-library/react';
 import { renderWithProviders } from '@/shared/test/render';
-import { fakeReports } from '../fake-data';
+import { fakeReports } from '../mocks/fake-data';
 import { ReportsPage } from './ReportsPage';
 
 describe('ReportsPage', () => {
   it('shows a card for every report', () => {
     renderWithProviders(<ReportsPage />);
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Raports' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Reports' })).toBeInTheDocument();
     expect(screen.getByText('Scheduled and on-demand exports')).toBeInTheDocument();
     for (const report of fakeReports) {
       expect(screen.getByRole('heading', { level: 2, name: report.name })).toBeInTheDocument();

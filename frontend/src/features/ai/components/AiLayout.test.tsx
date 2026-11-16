@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react';
 import { renderRoutes } from '@/shared/test/render';
-import { aiRoutes } from './routes';
+import { aiRoutes } from '../routes';
 
 describe('AiLayout', () => {
   it('renders the four tabs in order', () => {

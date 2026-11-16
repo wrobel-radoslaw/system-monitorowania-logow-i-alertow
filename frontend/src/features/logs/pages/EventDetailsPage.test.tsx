@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
-import { mockEvents } from '@/shared/mocks/events';
+import { mockEvents } from '../mocks/events';
 import { renderRoutes } from '@/shared/test/render';
 import { server } from '@/shared/test/server';
 import { logsRoutes } from '../routes';
@@ -18,7 +18,8 @@ describe('EventDetailsPage', () => {
     expect(screen.getByText(event.severity)).toBeInTheDocument();
     expect(screen.getByText(event.code)).toBeInTheDocument();
     expect(screen.getByText(event.message)).toBeInTheDocument();
-    expect(screen.getByText(event.status)).toBeInTheDocument();
+    // The status shows as a badge with a readable label, e.g. NEW → "New".
+    expect(screen.getByText(new RegExp(`^${event.status}$`, 'i'))).toBeInTheDocument();
     expect(screen.getByText(new Date(event.timestamp).toLocaleString())).toBeInTheDocument();
   });
 

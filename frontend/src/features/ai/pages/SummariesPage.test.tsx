@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { renderWithProviders } from '@/shared/test/render';
-import { fakeSummaries } from '../fake-data';
+import { fakeSummaries } from '../mocks/fake-data';
 import { SummariesPage } from './SummariesPage';
 
 describe('SummariesPage', () => {

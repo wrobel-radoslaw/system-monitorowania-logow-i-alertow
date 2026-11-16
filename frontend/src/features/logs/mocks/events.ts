@@ -1,4 +1,4 @@
-import type { EventDto, EventStatus, Severity } from '@/shared/types/events';
+import type { EventDto, EventStatus, Severity } from '../types';
 import seededEvents from './events.json';
 
 // events.json is generator output (see frontend/README.md). The generator has no status field and
@@ -15,7 +15,11 @@ const fakeRows: FakeRow[] = [
     'ERROR',
     'payments',
     'UPSTREAM_TIMEOUT',
-    'POST /checkout 503 upstream timeout after 5000ms (db-primary)',
+    // Deliberately long, to check that long messages don't break the table layout.
+    'POST /checkout 503 upstream timeout after 5000ms (db-primary): ' +
+      'System.TimeoutException: The operation has timed out. at Npgsql.NpgsqlConnector.ReadMessage() ' +
+      'at Payments.Checkout.ChargeHandler.HandleAsync(ChargeRequest request, CancellationToken ct) ' +
+      'retry=3/3 correlationId=7c1e9a2b-55f0-4f7e-9d3a-0b8e2f6a1c44',
   ],
   [
     [12, 97, 1],

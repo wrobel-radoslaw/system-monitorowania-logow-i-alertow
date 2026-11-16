@@ -1,8 +1,9 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
-import { mockEvents } from '@/shared/mocks/events';
+import { mockEvents } from '../mocks/events';
 import { renderWithProviders } from '@/shared/test/render';
 import { server } from '@/shared/test/server';
+import { mockViewport } from '@/shared/test/viewport';
 import { LogsPage } from './LogsPage';
 
 /** Records the query string of every list request while still using the mock response. */
@@ -44,6 +45,20 @@ describe('LogsPage', () => {
       'href',
       '/logs/fake-log-1',
     );
+  });
+
+  it('shows one card per event instead of a table on phones', async () => {
+    mockViewport('mobile');
+    renderWithProviders(<LogsPage />);
+
+    expect(await screen.findByText(/Showing 10 of 110 entries/)).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+
+    const first = screen.getByRole('link', { name: /POST \/checkout 503/ });
+    expect(first).toHaveAttribute('href', '/logs/fake-log-1');
+    expect(within(first).getByText('ERROR')).toBeInTheDocument();
+    expect(within(first).getByText('payments')).toBeInTheDocument();
+    expect(within(first).getByText('14:05:12.381')).toBeInTheDocument();
   });
 
   it('sends the chosen level to the API and shows only matching events', async () => {

@@ -35,6 +35,7 @@ export function getErrorMessage(error: unknown) {
   if (error instanceof ApiError) {
     if (error.status === 400) return 'The filters are not valid. Check the date range.';
     if (error.status === 404) return 'This item was not found.';
+    if (error.status === 409) return 'This item was changed by someone else. Reload and try again.';
     if (error.status === 503) return 'The database is unavailable. Try again later.';
   }
   return 'Could not load the data. Check that the API is running.';

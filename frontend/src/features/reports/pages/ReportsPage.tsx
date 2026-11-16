@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
 import { PageHeader } from '@/shared/ui/PageHeader';
-import { fakeReports } from '../fake-data';
+import { fakeReports } from '../mocks/fake-data';
 
 export function ReportsPage() {
   const [generating, setGenerating] = useState(false);
@@ -10,7 +10,7 @@ export function ReportsPage() {
   return (
     <>
       <PageHeader
-        title="Raports"
+        title="Reports"
         subtitle="Scheduled and on-demand exports"
         actions={
           <Button variant="primary" onClick={() => setGenerating(true)}>
@@ -20,7 +20,7 @@ export function ReportsPage() {
       />
       <div className="flex flex-col gap-5">
         {generating && (
-          <Card role="status" className="border-accent! bg-accent-soft!">
+          <Card role="status" variant="notice">
             Report “Ad-hoc · last 24h” is being generated. It will appear below in a minute.
           </Card>
         )}

@@ -1,6 +1,7 @@
 import { screen, within } from '@testing-library/react';
 import { renderRoutes } from '@/shared/test/render';
-import { fakeAnomalies } from '../fake-data';
+import { mockViewport } from '@/shared/test/viewport';
+import { fakeAnomalies } from '../mocks/fake-data';
 import { aiRoutes } from '../routes';
 
 describe('AnomaliesPage', () => {
@@ -16,6 +17,22 @@ describe('AnomaliesPage', () => {
     expect(first.getByText('payments')).toBeInTheDocument();
     expect(first.getByText('96')).toBeInTheDocument();
     expect(first.getByText('14:02')).toBeInTheDocument();
+  });
+
+  it('shows cards instead of a table on phones', () => {
+    mockViewport('mobile');
+    renderRoutes(aiRoutes, ['/ai/anomalies']);
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    // The AI tabs are list items too; cards are the ones with an Investigate link.
+    const cards = screen
+      .getAllByRole('listitem')
+      .filter((item) => within(item).queryByRole('link', { name: /^Investigate/ }));
+    expect(cards).toHaveLength(fakeAnomalies.length);
+    expect(within(cards[0]).getByText('Error rate spike')).toBeInTheDocument();
+    expect(
+      within(cards[0]).getByRole('link', { name: 'Investigate Error rate spike' }),
+    ).toHaveAttribute('href', '/ai/root-cause?incident=0');
   });
 
   it('opens Root Cause on the incident of the investigated anomaly', async () => {

@@ -2,9 +2,11 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { Badge } from '@/shared/ui/Badge';
 import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
+import { CardTitle } from '@/shared/ui/CardTitle';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Pill } from '@/shared/ui/Pill';
-import { fakeIncidents, INCIDENT_QUESTION } from '../fake-data';
+import { PillGroup } from '@/shared/ui/PillGroup';
+import { fakeIncidents, INCIDENT_QUESTION } from '../mocks/fake-data';
 
 function readIncident(params: URLSearchParams) {
   const index = Number(params.get('incident'));
@@ -24,7 +26,7 @@ export function RootCausePage() {
         subtitle="Pick an incident to see the reconstructed chain of events"
       />
       <div className="flex flex-col gap-5">
-        <div role="group" aria-label="Incident" className="flex flex-wrap gap-2">
+        <PillGroup label="Incident">
           {fakeIncidents.map((item, index) => (
             <Pill
               key={item.label}
@@ -34,11 +36,11 @@ export function RootCausePage() {
               {item.label}
             </Pill>
           ))}
-        </div>
+        </PillGroup>
 
         <div className="grid grid-cols-[repeat(auto-fit,minmax(min(320px,100%),1fr))] gap-4">
           <Card>
-            <h2 className="mb-4 text-[17px] font-bold">Timeline</h2>
+            <CardTitle className="mb-4">Timeline</CardTitle>
             <ol>
               {incident.steps.map((step) => (
                 <li key={step.time} className="flex gap-3.5">
@@ -61,15 +63,15 @@ export function RootCausePage() {
           </Card>
 
           <div className="flex flex-col gap-4">
-            <Card className="border-accent!">
+            <Card variant="accent">
               <div className="flex items-center justify-between gap-2">
-                <h2 className="text-[17px] font-bold">Probable cause</h2>
+                <CardTitle>Probable cause</CardTitle>
                 <Badge tone="success">{incident.confidence} confidence</Badge>
               </div>
               <p className="mt-3 leading-relaxed">{incident.cause}</p>
             </Card>
             <Card>
-              <h2 className="mb-2.5 text-[17px] font-bold">Suggested fix</h2>
+              <CardTitle className="mb-2.5">Suggested fix</CardTitle>
               <ol className="list-decimal pl-5 leading-[1.8] text-muted">
                 {incident.fixes.map((fix) => (
                   <li key={fix}>{fix}</li>

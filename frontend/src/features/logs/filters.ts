@@ -5,7 +5,7 @@ import {
   type EventQuery,
   type EventStatus,
   type Severity,
-} from '@/shared/types/events';
+} from './types';
 
 export const PAGE_SIZE = 10;
 

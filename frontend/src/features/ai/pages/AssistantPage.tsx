@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
 import { Input } from '@/shared/ui/Input';
 import { PageHeader } from '@/shared/ui/PageHeader';
-import { ASSISTANT_GREETING, assistantSuggestions, fakeAnswer } from '../fake-data';
+import { ASSISTANT_GREETING, assistantSuggestions, fakeAnswer } from '../mocks/fake-data';
 
 type Message = { role: 'user' | 'bot'; text: string };
 
@@ -50,7 +50,7 @@ export function AssistantPage() {
           {messages.map((message, index) => (
             <div
               key={index}
-              className={`max-w-[72%] rounded-xl border px-4 py-3 text-[15px] leading-normal whitespace-pre-line ${bubbleClass[message.role]}`}
+              className={`max-w-[88%] md:max-w-[72%] rounded-xl border px-4 py-3 text-[15px] leading-normal whitespace-pre-line ${bubbleClass[message.role]}`}
             >
               {message.text}
             </div>

@@ -1,4 +1,4 @@
-// Fake data for designing the Raports page. There is no reports API yet.
+// Fake data for designing the Reports page. There is no reports API yet.
 
 export const fakeReports = [
   {

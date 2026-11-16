@@ -1,6 +1,10 @@
 import { http, HttpResponse, type AnyHandler } from 'msw';
-import { mockEvents } from '@/shared/mocks/events';
-import type { EventDto, PaginatedEventsDto } from '@/shared/types/events';
+import { mockEvents } from './events';
+import { EVENT_STATUSES, type EventDto, type EventStatus, type PaginatedEventsDto } from '../types';
+
+function isStatus(value: unknown): value is EventStatus {
+  return EVENT_STATUSES.includes(value as EventStatus);
+}
 
 function problem(status: number, title: string, detail: string) {
   return HttpResponse.json(
@@ -79,5 +83,32 @@ export const handlers: AnyHandler[] = [
           'Not Found',
           `Nie znaleziono zdarzenia o eventId '${String(params.eventId)}'.`,
         );
+  }),
+
+  // Like the backend: change only while the event still has expectedStatus, else 409.
+  // The change lives in memory until the page reloads.
+  http.patch('*/api/events/:eventId/status', async ({ params, request }) => {
+    const body = (await request.json().catch(() => null)) as {
+      expectedStatus?: unknown;
+      status?: unknown;
+    } | null;
+    if (!body || body.expectedStatus == null || body.status == null) {
+      return problem(400, 'Bad Request', 'expectedStatus i status są wymagane.');
+    }
+    if (!isStatus(body.expectedStatus)) {
+      return problem(400, 'Bad Request', 'Nieprawidłowy expectedStatus.');
+    }
+    if (!isStatus(body.status)) {
+      return problem(400, 'Bad Request', 'Nieprawidłowy status.');
+    }
+
+    const event = mockEvents.find((candidate) => candidate.eventId === params.eventId);
+    if (!event) return problem(404, 'Not Found', 'Nie znaleziono zdarzenia.');
+    if (event.status !== body.expectedStatus) {
+      return problem(409, 'Conflict', 'Status zdarzenia został wcześniej zmieniony.');
+    }
+
+    event.status = body.status;
+    return HttpResponse.json(event);
   }),
 ];

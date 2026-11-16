@@ -1,31 +1,36 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
 export type Theme = 'dark' | 'light';
 
 const STORAGE_KEY = 'theme';
 
-// index.html sets data-theme before first paint (saved choice, otherwise dark).
-function readInitialTheme(): Theme {
+// The theme lives on <html data-theme>. index.html sets it before first paint (saved choice,
+// otherwise dark). Every toggle on screen reads this one value, so two toggles never disagree.
+const listeners = new Set<() => void>();
+
+function readTheme(): Theme {
   return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
 }
 
-export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(readInitialTheme);
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
 
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
+export function useTheme() {
+  const theme = useSyncExternalStore(subscribe, readTheme, (): Theme => 'dark');
 
   const toggleTheme = useCallback(() => {
-    setTheme((current) => {
-      const next: Theme = current === 'dark' ? 'light' : 'dark';
-      try {
-        localStorage.setItem(STORAGE_KEY, next);
-      } catch {
-        // Storage can be unavailable (private mode); the theme still applies for this visit.
-      }
-      return next;
-    });
+    const next: Theme = readTheme() === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem(STORAGE_KEY, next);
+    } catch {
+      // Storage can be unavailable (private mode); the theme still applies for this visit.
+    }
+    listeners.forEach((listener) => listener());
   }, []);
 
   return { theme, toggleTheme };

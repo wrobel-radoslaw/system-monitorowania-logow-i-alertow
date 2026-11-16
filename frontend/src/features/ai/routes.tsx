@@ -1,9 +1,9 @@
 import { Navigate, type RouteObject } from 'react-router';
-import { AiLayout } from './AiLayout';
-import { AnomaliesPage } from './anomalies/AnomaliesPage';
-import { AssistantPage } from './assistant/AssistantPage';
-import { RootCausePage } from './root-cause/RootCausePage';
-import { SummariesPage } from './summaries/SummariesPage';
+import { AiLayout } from './components/AiLayout';
+import { AnomaliesPage } from './pages/AnomaliesPage';
+import { AssistantPage } from './pages/AssistantPage';
+import { RootCausePage } from './pages/RootCausePage';
+import { SummariesPage } from './pages/SummariesPage';
 
 export const aiRoutes: RouteObject[] = [
   {

@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router';
+import { UnderlineLabel } from './UnderlineLabel';
 
 export type TabItem = {
   to: string;
@@ -14,17 +15,15 @@ type TabsProps = {
 export function Tabs({ label, items }: TabsProps) {
   return (
     <nav aria-label={label} className="mb-7 border-b border-border">
-      <ul className="flex flex-wrap gap-2">
+      {/* Below 1024px the tabs stay on one line and scroll sideways instead of wrapping. */}
+      <ul className="flex gap-2 overflow-x-auto lg:flex-wrap lg:overflow-visible">
         {items.map((item) => (
-          <li key={item.to}>
+          <li key={item.to} className="shrink-0">
             <NavLink
               to={item.to}
-              className="group block rounded-t-lg px-3 pt-2 text-[17px] whitespace-nowrap text-muted transition-colors duration-150 hover:bg-hover hover:text-text aria-[current=page]:text-text"
+              className="group block rounded-t-lg px-2.5 pt-2 text-[15px] whitespace-nowrap md:px-3 md:text-[17px] text-muted transition-colors duration-150 hover:bg-hover hover:text-text aria-[current=page]:text-text"
             >
-              {/* The underline is on this span, so it is exactly as wide as the text. */}
-              <span className="inline-block border-b-2 border-transparent pb-3 transition-colors duration-200 group-aria-[current=page]:border-accent">
-                {item.label}
-              </span>
+              <UnderlineLabel gap="pb-3">{item.label}</UnderlineLabel>
             </NavLink>
           </li>
         ))}

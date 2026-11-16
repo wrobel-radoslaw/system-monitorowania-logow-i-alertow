@@ -3,7 +3,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
 import { PageHeader } from '@/shared/ui/PageHeader';
-import { fakeSummaries } from '../fake-data';
+import { fakeSummaries } from '../mocks/fake-data';
 
 function RefreshIcon() {
   return (

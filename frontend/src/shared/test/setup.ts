@@ -7,6 +7,7 @@ beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 afterEach(() => {
   cleanup();
   server.resetHandlers();
+  vi.unstubAllGlobals();
   localStorage.clear();
   delete document.documentElement.dataset.theme;
 });

@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { renderRoutes } from '@/shared/test/render';
-import { fakeIncidents, INCIDENT_QUESTION } from '../fake-data';
+import { fakeIncidents, INCIDENT_QUESTION } from '../mocks/fake-data';
 import { aiRoutes } from '../routes';
 
 describe('RootCausePage', () => {
