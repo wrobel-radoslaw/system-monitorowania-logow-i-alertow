@@ -30,6 +30,7 @@ Copy-Item .env.example .env
 - PostgreSQL słucha wewnątrz sieci Compose na `db:5432`. Port hosta jest przydzielany z zakresu `POSTGRES_PORT` (domyślnie `5432-5500`) i publikowany wyłącznie na `127.0.0.1`.
 - API słucha wewnątrz Compose na `api:8080`. Port hosta określa `API_PORT` (domyślnie `5136`) i również jest publikowany wyłącznie na `127.0.0.1`.
 - API łączy się z PostgreSQL przez nazwę serwisu `db`, a nie przez `localhost`.
+- Frontend działa w kontenerze Nginx na porcie `80` i przekazuje żądania `/api/` do `api:8080`. Port hosta określa `FRONTEND_PORT` (domyślnie `5173`), publikowany lokalnie na `127.0.0.1`.
 
 Rzeczywiste porty hosta można sprawdzić poleceniami:
 
@@ -48,7 +49,7 @@ docker compose up --build -d
 docker compose ps
 ```
 
-Compose uruchamia PostgreSQL i API. API rozpoczyna start po osiągnięciu stanu `healthy` przez bazę. Healthcheck PostgreSQL używa `pg_isready`; healthcheck API wykonuje rzeczywiste żądanie `GET /api/health` na porcie kontenera `8080`.
+Compose uruchamia PostgreSQL, API i frontend. API rozpoczyna start po osiągnięciu stanu `healthy` przez bazę, a frontend po osiągnięciu stanu `healthy` przez API. Healthcheck PostgreSQL używa `pg_isready`; healthcheck API wykonuje rzeczywiste żądanie `GET /api/health` na porcie kontenera `8080`.
 
 Stan i logi usług:
 
@@ -85,7 +86,7 @@ docker compose down -v
 
 ### Zakres usług
 
-W aktualnym repozytorium dostępne są serwisy PostgreSQL i API. Serwis frontendowy nie jest dodawany w tej karcie, ponieważ jego implementacja i pliki uruchomieniowe należą do osobnej karty frontendowej. Po dostarczeniu rzeczywistej aplikacji i jej Dockerfile Compose zostanie uzupełniony o frontend; nie jest uruchamiana żadna atrapa.
+W aktualnym repozytorium dostępne są wszystkie trzy usługi: PostgreSQL (`db`), backend (`api`) oraz aplikacja webowa (`frontend`).
 
 ## Generator zdarzeń
 

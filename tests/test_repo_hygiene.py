@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-ENV_KEYS = {"POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_PORT", "API_PORT"}
+ENV_KEYS = {"POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_PORT", "API_PORT", "FRONTEND_PORT"}
 IGNORED_DIRS = {
     ".git", "__pycache__", ".pytest_cache", ".venv", "venv", "node_modules",
     "bin", "obj", "dist", "coverage", "TestResults",
@@ -158,7 +158,7 @@ class ComposeTests(unittest.TestCase):
         self.assertEqual(set(self.env), ENV_KEYS)
         for variable in self.env:
             self.assertIn("${" + variable, self.compose, variable)
-        for name in ("POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PORT", "API_PORT"):
+        for name in ("POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PORT", "API_PORT", "FRONTEND_PORT"):
             self.assertIn(self.env[name], self.compose)
 
     def test_compose_only_builds_components_that_exist(self):
@@ -244,8 +244,7 @@ class DocumentationTests(unittest.TestCase):
             self.assertNotIn("pozostaje niepotwierdzona", readme)
     def test_compose_stage_and_api_dependency_are_documented(self):
         readme = read_text("README.md")
-        self.assertIn("Compose uruchamia PostgreSQL i API", readme)
-        self.assertIn("rzeczywistej aplikacji i jej Dockerfile", readme)
+        self.assertIn("Compose uruchamia PostgreSQL, API i frontend", readme)
         self.assertIn("GET /api/health", readme)
         self.assertIn("503", readme)
 
