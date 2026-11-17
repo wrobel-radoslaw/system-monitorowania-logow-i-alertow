@@ -16,4 +16,6 @@ public class Alert
     public DateTime TriggeredAt { get; set; }
 
     public string DeliveryStatus { get; set; } = "PENDING";
+    public int Attempts {get; set;} = 0;
+    public int? LastHttpStatus {get; set; }
 }

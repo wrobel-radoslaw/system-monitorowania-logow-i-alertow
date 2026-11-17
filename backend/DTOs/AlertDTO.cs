@@ -17,4 +17,7 @@ public class AlertDto
     public DateTimeOffset TriggeredAt { get; set; }
 
     public AlertDeliveryStatus DeliveryStatus { get; set; }
+
+    public int Attempts {get; set; }
+    public int? LastHttpStatus { get; set; }
 }

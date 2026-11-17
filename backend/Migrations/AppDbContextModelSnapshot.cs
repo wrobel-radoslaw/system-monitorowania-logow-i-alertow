@@ -28,6 +28,12 @@ namespace backend.Migrations
                         .HasColumnType("text")
                         .HasColumnName("alert_id");
 
+                    b.Property<int>("Attempts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("attempts");
+
                     b.Property<string>("DeliveryStatus")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -39,6 +45,10 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("event_id");
+
+                    b.Property<int?>("LastHttpStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("last_http_status");
 
                     b.Property<string>("MachineId")
                         .IsRequired()
@@ -60,6 +70,10 @@ namespace backend.Migrations
                         .HasColumnName("triggered_at");
 
                     b.HasKey("AlertId");
+
+                    b.HasIndex("EventId", "RuleName")
+                        .IsUnique()
+                        .HasDatabaseName("ix_alerts_event_id_rule_name");
 
                     b.ToTable("alerts", (string)null);
                 });
