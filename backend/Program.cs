@@ -282,7 +282,7 @@ app.MapPost("/api/events", async (
                 EventId = newAlert.EventId,
                 MachineId = newAlert.MachineId,
                 RuleName = newAlert.RuleName,
-                Severity = Enum.Parse<Severity>(newAlert.Severity),
+                Severity = newAlert.Severity,
                 TriggeredAt = new DateTimeOffset(
                     DateTime.SpecifyKind(
                         newAlert.TriggeredAt,
