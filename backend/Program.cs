@@ -557,6 +557,7 @@ app.MapPatch("/api/events/{eventId}/status", async (
     );
 }
 
+
 // Walidacja wartości enum
 if (!Enum.IsDefined(request.ExpectedStatus.Value))
 {
@@ -573,6 +574,26 @@ if (!Enum.IsDefined(request.Status.Value))
         statusCode: StatusCodes.Status400BadRequest,
         title: "Bad Request",
         detail: "Nieprawidłowy status."
+    );
+}
+
+// Walidacja dozwolonych przejść
+bool isAllowedTransition =
+    (request.ExpectedStatus.Value.ToString(),
+     request.Status.Value.ToString()) switch
+    {
+        ("NEW", "ACKNOWLEDGED") => true,
+        ("NEW", "RESOLVED") => true,
+        ("ACKNOWLEDGED", "RESOLVED") => true,
+        _ => false
+    };
+
+if (!isAllowedTransition)
+{
+    return Results.Problem(
+        statusCode: StatusCodes.Status409Conflict,
+        title: "Conflict",
+        detail: "Niedozwolone przejście między statusami."
     );
 }
 
