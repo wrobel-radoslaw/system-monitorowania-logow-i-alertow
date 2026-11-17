@@ -167,6 +167,7 @@ class ComposeTests(unittest.TestCase):
     def test_compose_only_builds_components_that_exist(self):
         for service, component_dir in (
             ("api", "backend"), ("frontend", "frontend"), ("webhook-stub", "tools/webhook-stub"),
+            ("event-generator", "tools/event-generator"),
         ):
             defined = re.search(r"(?m)^  " + re.escape(service) + r":$", self.compose) is not None
             dockerfile = ROOT / component_dir / "Dockerfile"
@@ -212,6 +213,14 @@ class ComposeTests(unittest.TestCase):
         self.assertIsNotNone(depends_on, "api musi zależeć od db")
         self.assertRegex(depends_on.group(1), r"(?m)^      db:\r?\n        condition: service_healthy")
         self.assertNotIn("webhook-stub", depends_on.group(1), "niedostępny stub nie może blokować startu API")
+
+    def test_event_generator_runs_only_on_demand_inside_compose_network(self):
+        generator = self.service_block("event-generator")
+        self.assertIn('profiles: ["generator"]', generator)
+        self.assertIn("API_URL: http://api:8080", generator)
+        self.assertRegex(generator, r"(?m)^      api:\r?\n        condition: service_healthy$")
+        self.assertNotIn("ports:", generator)
+        self.assertIn('restart: "no"', generator)
 
 class CiTests(unittest.TestCase):
     def setUp(self):
@@ -279,6 +288,14 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn("Compose uruchamia PostgreSQL, API, frontend i stub webhooków", readme)
         self.assertIn("GET /api/health", readme)
         self.assertIn("503", readme)
+
+    def test_generator_http_mode_and_scenarios_are_documented(self):
+        readme = read_text("README.md")
+        for phrase in (
+            "--send", "API_URL", "--interval", "--forever", "--scenario", "critical-once", "normal", "warn-spike",
+            "gradual-degradation", "--ground-truth", "docker compose --profile generator run --rm event-generator",
+        ):
+            self.assertIn(phrase, readme)
 
     def test_webhook_stub_usage_is_documented(self):
         readme = read_text("README.md")
