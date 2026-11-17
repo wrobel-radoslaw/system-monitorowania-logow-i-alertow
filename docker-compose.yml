@@ -29,6 +29,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=${POSTGRES_DB:-csp};Username=${POSTGRES_USER:-csp};Password=${POSTGRES_PASSWORD:?Copy .env.example to .env and set POSTGRES_PASSWORD}"
+      Webhook__Url: http://webhook-stub:8080/webhook
     ports:
       - target: 8080
         published: "${API_PORT:-5136}"
@@ -57,6 +58,25 @@ services:
     depends_on:
       api:
         condition: service_healthy
+
+  webhook-stub:
+    build:
+      context: ./tools/webhook-stub
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      WEBHOOK_STUB_RESPONSE_STATUS: ${WEBHOOK_STUB_RESPONSE_STATUS:-200}
+    ports:
+      - target: 8080
+        published: "${WEBHOOK_STUB_PORT:-8090}"
+        host_ip: 127.0.0.1
+        protocol: tcp
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
 volumes:
   csp_postgres_data:

@@ -4,7 +4,10 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-ENV_KEYS = {"POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_PORT", "API_PORT", "FRONTEND_PORT"}
+ENV_KEYS = {
+    "POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_PORT", "API_PORT", "FRONTEND_PORT",
+    "WEBHOOK_STUB_PORT", "WEBHOOK_STUB_RESPONSE_STATUS",
+}
 IGNORED_DIRS = {
     ".git", "__pycache__", ".pytest_cache", ".venv", "venv", "node_modules",
     "bin", "obj", "dist", "coverage", "TestResults",
@@ -158,11 +161,13 @@ class ComposeTests(unittest.TestCase):
         self.assertEqual(set(self.env), ENV_KEYS)
         for variable in self.env:
             self.assertIn("${" + variable, self.compose, variable)
-        for name in ("POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PORT", "API_PORT", "FRONTEND_PORT"):
+        for name in ("POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PORT", "API_PORT", "FRONTEND_PORT", "WEBHOOK_STUB_PORT"):
             self.assertIn(self.env[name], self.compose)
 
     def test_compose_only_builds_components_that_exist(self):
-        for service, component_dir in (("api", "backend"), ("frontend", "frontend")):
+        for service, component_dir in (
+            ("api", "backend"), ("frontend", "frontend"), ("webhook-stub", "tools/webhook-stub"),
+        ):
             defined = re.search(r"(?m)^  " + re.escape(service) + r":$", self.compose) is not None
             dockerfile = ROOT / component_dir / "Dockerfile"
             if defined:
@@ -180,6 +185,33 @@ class ComposeTests(unittest.TestCase):
             elif dockerfile.is_file():
                 self.fail(f"{dockerfile.relative_to(ROOT)} exists but Compose has no {service} service")
 
+    def service_block(self, service):
+        match = re.search(r"(?ms)^  " + re.escape(service) + r":\r?\n(.*?)(?=^  \S|^\S|\Z)", self.compose)
+        self.assertIsNotNone(match, service)
+        return match.group(1)
+
+    def test_all_published_ports_are_bound_to_loopback(self):
+        published = re.findall(r"(?m)^\s+published:", self.compose)
+        self.assertTrue(published)
+        self.assertEqual(len(published), len(re.findall(r"(?m)^\s+host_ip: 127\.0\.0\.1$", self.compose)))
+        self.assertNotRegex(self.compose, r'(?m)^\s+- "?\d')
+
+    def test_webhook_stub_service_is_wired_to_api(self):
+        stub = self.service_block("webhook-stub")
+        self.assertIn('published: "${WEBHOOK_STUB_PORT:-8090}"', stub)
+        self.assertIn("target: 8080", stub)
+        self.assertIn("host_ip: 127.0.0.1", stub)
+        self.assertIn("WEBHOOK_STUB_RESPONSE_STATUS: ${WEBHOOK_STUB_RESPONSE_STATUS:-200}", stub)
+        self.assertIn("healthcheck:", stub)
+        self.assertIn("http://127.0.0.1:8080/health", stub)
+        self.assertEqual(self.env["WEBHOOK_STUB_RESPONSE_STATUS"], "200")
+
+        api = self.service_block("api")
+        self.assertIn("Webhook__Url: http://webhook-stub:8080/webhook", api)
+        depends_on = re.search(r"(?ms)^    depends_on:\r?\n(.*?)(?=^    \S|\Z)", api)
+        self.assertIsNotNone(depends_on, "api musi zależeć od db")
+        self.assertRegex(depends_on.group(1), r"(?m)^      db:\r?\n        condition: service_healthy")
+        self.assertNotIn("webhook-stub", depends_on.group(1), "niedostępny stub nie może blokować startu API")
 
 class CiTests(unittest.TestCase):
     def setUp(self):
@@ -244,9 +276,17 @@ class DocumentationTests(unittest.TestCase):
             self.assertNotIn("pozostaje niepotwierdzona", readme)
     def test_compose_stage_and_api_dependency_are_documented(self):
         readme = read_text("README.md")
-        self.assertIn("Compose uruchamia PostgreSQL, API i frontend", readme)
+        self.assertIn("Compose uruchamia PostgreSQL, API, frontend i stub webhooków", readme)
         self.assertIn("GET /api/health", readme)
         self.assertIn("503", readme)
+
+    def test_webhook_stub_usage_is_documented(self):
+        readme = read_text("README.md")
+        for phrase in (
+            "tools/webhook-stub/webhook_stub.py", "POST /webhook", "WEBHOOK_STUB_RESPONSE_STATUS",
+            "WEBHOOK_STUB_PORT", "GET /requests", "/config/response-status", "docker compose logs -f webhook-stub",
+        ):
+            self.assertIn(phrase, readme)
 
     def test_branch_pr_review_and_branch_protection_are_documented(self):
         contributing = read_text("CONTRIBUTING.md")
