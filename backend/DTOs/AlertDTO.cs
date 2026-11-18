@@ -12,9 +12,12 @@ public class AlertDto
 
     public string RuleName { get; set; } = null!;
 
-    public Severity Severity { get; set; }
+    public string Severity { get; set; } = null!;
 
     public DateTimeOffset TriggeredAt { get; set; }
 
     public AlertDeliveryStatus DeliveryStatus { get; set; }
+
+    public int Attempts {get; set; }
+    public int? LastHttpStatus { get; set; }
 }

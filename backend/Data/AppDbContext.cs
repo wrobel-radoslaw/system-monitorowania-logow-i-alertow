@@ -103,6 +103,20 @@ public class AppDbContext : DbContext
                 .HasColumnType("text")
                 .HasDefaultValue("PENDING")
                 .IsRequired();
+            
+            entity.Property(a => a.Attempts)
+                .HasColumnName("attempts")
+                .HasColumnType("integer")
+                .HasDefaultValue(0)
+                .IsRequired();
+                
+            entity.Property(a => a.LastHttpStatus)
+                .HasColumnName("last_http_status");
+
+            entity.HasIndex(a => new { a.EventId, a.RuleName })
+                .IsUnique()
+                .HasDatabaseName("ix_alerts_event_id_rule_name");
+
         });
     }
 }

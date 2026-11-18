@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using System.Net.Http.Json;
 using System.Text.RegularExpressions;
 using Npgsql;
 using backend.Data;
 using backend.Models;
 using backend.DTOs;
 using backend.Enums;
+using backend.Services;
 
 var allowedSeverities = new[]
 {
@@ -46,11 +46,23 @@ if (string.IsNullOrEmpty(connectionString))
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Konfiguracja HTTP Client dla webhooka
+// Konfiguracja webhooka
+var webhookUrl = builder.Configuration["Webhook:Url"];
+
+if (string.IsNullOrWhiteSpace(webhookUrl))
+{
+    throw new InvalidOperationException(
+        "Brak konfiguracji Webhook:Url");
+}
+
 builder.Services.AddHttpClient("Webhook", client =>
 {
-    client.Timeout = TimeSpan.FromSeconds(5);
+    client.BaseAddress = new Uri(webhookUrl);
+    client.Timeout = TimeSpan.FromSeconds(10);
 });
+
+// Dispatcher alertów
+builder.Services.AddHostedService<AlertDispatcherService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -150,7 +162,6 @@ app.MapGet("/api/health", async (
 app.MapPost("/api/events", async (
     CreateEventRequest request,
     AppDbContext db,
-    IHttpClientFactory httpClientFactory,
     CancellationToken cancellationToken) =>
 {
     // Walidacja wymaganych pól
@@ -243,7 +254,8 @@ app.MapPost("/api/events", async (
             RuleName = "ERROR_CRITICAL",
             Severity = newEvent.Severity,
             TriggeredAt = DateTime.UtcNow,
-            DeliveryStatus = "PENDING"
+            DeliveryStatus = "PENDING",
+            Attempts = 0
         };
 
         db.Alerts.Add(newAlert);
@@ -263,83 +275,6 @@ app.MapPost("/api/events", async (
             title: "Conflict",
             detail: $"Zdarzenie o eventId '{eventId}' już istnieje."
         );
-    }
-
-    // Wysłanie webhooka, jeżeli skonfigurowano adres odbiorcy
-    if (newAlert != null)
-    {
-        string? webhookUrl = builder.Configuration["Webhook:Url"];
-        if (string.IsNullOrWhiteSpace(webhookUrl))
-        {
-            webhookUrl = builder.Configuration["WEBHOOK_URL"];
-        }
-
-        if (!string.IsNullOrWhiteSpace(webhookUrl))
-        {
-            var payload = new WebhookPayload
-            {
-                AlertId = newAlert.AlertId,
-                EventId = newAlert.EventId,
-                MachineId = newAlert.MachineId,
-                RuleName = newAlert.RuleName,
-                Severity = newAlert.Severity,
-                TriggeredAt = new DateTimeOffset(
-                    DateTime.SpecifyKind(
-                        newAlert.TriggeredAt,
-                        DateTimeKind.Utc
-                    )
-                )
-            };
-
-            try
-            {
-                if (!Uri.TryCreate(
-                    webhookUrl,
-                    UriKind.Absolute,
-                    out var webhookUri) ||
-                    (webhookUri.Scheme != Uri.UriSchemeHttp &&
-                     webhookUri.Scheme != Uri.UriSchemeHttps))
-                {
-                    throw new InvalidOperationException(
-                        "Nieprawidłowy adres webhooka."
-                    );
-                }
-
-                var client = httpClientFactory.CreateClient("Webhook");
-
-                var webhookResponse = await client.PostAsJsonAsync(
-                    webhookUri,
-                    payload,
-                    cancellationToken
-                );
-
-                newAlert.DeliveryStatus = webhookResponse.IsSuccessStatusCode
-                    ? "SENT"
-                    : "FAILED";
-
-                if (!webhookResponse.IsSuccessStatusCode)
-                {
-                    app.Logger.LogWarning(
-                        "Webhook returned status code {StatusCode}.",
-                        webhookResponse.StatusCode
-                    );
-                }
-            }
-            catch (Exception ex) when (
-                ex is HttpRequestException ||
-                ex is TaskCanceledException ||
-                ex is InvalidOperationException)
-            {
-                newAlert.DeliveryStatus = "FAILED";
-
-                app.Logger.LogWarning(
-                    ex,
-                    "Webhook delivery failed."
-                );
-            }
-
-            await db.SaveChangesAsync(cancellationToken);
-        }
     }
 
     // Odpowiedź
@@ -557,6 +492,7 @@ app.MapPatch("/api/events/{eventId}/status", async (
     );
 }
 
+
 // Walidacja wartości enum
 if (!Enum.IsDefined(request.ExpectedStatus.Value))
 {
@@ -573,6 +509,26 @@ if (!Enum.IsDefined(request.Status.Value))
         statusCode: StatusCodes.Status400BadRequest,
         title: "Bad Request",
         detail: "Nieprawidłowy status."
+    );
+}
+
+// Walidacja dozwolonych przejść
+bool isAllowedTransition =
+    (request.ExpectedStatus.Value.ToString(),
+     request.Status.Value.ToString()) switch
+    {
+        ("NEW", "ACKNOWLEDGED") => true,
+        ("NEW", "RESOLVED") => true,
+        ("ACKNOWLEDGED", "RESOLVED") => true,
+        _ => false
+    };
+
+if (!isAllowedTransition)
+{
+    return Results.Problem(
+        statusCode: StatusCodes.Status409Conflict,
+        title: "Conflict",
+        detail: "Niedozwolone przejście między statusami."
     );
 }
 
@@ -646,6 +602,7 @@ app.MapGet("/api/alerts", async (
     var alerts = await db.Alerts
         .AsNoTracking()
         .OrderByDescending(a => a.TriggeredAt)
+        .ThenBy(a => a.AlertId)
         .ToListAsync(cancellationToken);
 
     var response = alerts
@@ -687,7 +644,7 @@ static AlertDto ToAlertDTO(Alert a)
         EventId = a.EventId,
         MachineId = a.MachineId,
         RuleName = a.RuleName,
-        Severity = Enum.Parse<Severity>(a.Severity),
+        Severity = a.Severity,
         TriggeredAt = new DateTimeOffset(
             DateTime.SpecifyKind(
                 a.TriggeredAt,
@@ -696,7 +653,9 @@ static AlertDto ToAlertDTO(Alert a)
         ),
         DeliveryStatus = Enum.Parse<AlertDeliveryStatus>(
             a.DeliveryStatus
-        )
+        ),
+        Attempts = a.Attempts,
+        LastHttpStatus = a.LastHttpStatus
     };
 }
 
