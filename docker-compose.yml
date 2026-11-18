@@ -78,5 +78,17 @@ services:
       retries: 5
       start_period: 5s
 
+  event-generator:
+    build:
+      context: ./tools/event-generator
+      dockerfile: Dockerfile
+    profiles: ["generator"]
+    restart: "no"
+    environment:
+      API_URL: http://api:8080
+    depends_on:
+      api:
+        condition: service_healthy
+
 volumes:
   csp_postgres_data:

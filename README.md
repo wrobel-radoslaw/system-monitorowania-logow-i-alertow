@@ -88,11 +88,11 @@ docker compose down -v
 
 ### Zakres usług
 
-W aktualnym repozytorium dostępne są cztery usługi: PostgreSQL (`db`), backend (`api`), aplikacja webowa (`frontend`) oraz lokalny odbiornik webhooków (`webhook-stub`).
+W aktualnym repozytorium dostępne są cztery usługi: PostgreSQL (`db`), backend (`api`), aplikacja webowa (`frontend`) oraz lokalny odbiornik webhooków (`webhook-stub`). Generator zdarzeń (`event-generator`) jest w profilu `generator` i uruchamia się tylko na żądanie.
 
 ## Generator zdarzeń
 
-Generator działa offline, używa wyłącznie biblioteki standardowej Pythona i zapisuje JSON na stdout lub do pliku. Nie wysyła żądań HTTP.
+Generator używa wyłącznie biblioteki standardowej Pythona. Domyślnie działa offline i zapisuje JSON na stdout lub do pliku; z flagą `--send` wysyła zdarzenia do `POST {API_URL}/api/events`.
 
 ```powershell
 python tools/event-generator/generate_events.py --count 20
@@ -103,6 +103,50 @@ python tools/event-generator/generate_events.py --help
 `--count` ustawia liczbę zdarzeń, `--seed` zapewnia powtarzalne dane, `--start` ustawia początkowy czas ISO 8601 ze strefą, `--with-event-id` dodaje opcjonalne `eventId`, a `--output` wskazuje plik. Timestampy są zapisywane w UTC z końcówką `Z`. Payload nie zawiera pola `status`.
 
 Przykładowe dane są w `fixtures/events.sample.json`. Generator i fixture używają pól zgodnych ze schematem `CreateEventRequest`: wymagane `machineId`, `timestamp`, `severity`, `code` i `message`; opcjonalne `eventId`. Pole `status` nie należy do żądania tworzenia zdarzenia. Timestampy są zapisywane w UTC z końcówką `Z`.
+
+### Wysyłka do API
+
+Adres API pochodzi z `--api-url`, zmiennej `API_URL` albo domyślnie `http://127.0.0.1:5136`. Każde zdarzenie jest wysyłane osobnym żądaniem; odpowiedzi `2xx` są wypisywane na stdout, a błędy HTTP na stderr z kodem odpowiedzi i komunikatem `ProblemDetails` (bez nagłówków i danych logowania z adresu).
+
+```powershell
+$env:API_URL = "http://127.0.0.1:5136"
+python tools/event-generator/generate_events.py --send --count 20 --interval 1
+python tools/event-generator/generate_events.py --send --forever --interval 5
+python tools/event-generator/generate_events.py --send --scenario critical-once
+```
+
+- Tryb zwykły (`--scenario random`) losuje zdarzenia z co najmniej 3 maszyn i wszystkich poziomów `severity`; przy wysyłce bez `--start` timestamp to bieżący czas UTC.
+- `--interval` ustawia odstęp w sekundach, `--count` liczbę zdarzeń, a `--forever` wysyła bez limitu do przerwania (Ctrl+C).
+- `critical-once` wysyła dokładnie jedno kontrolowane zdarzenie `CRITICAL` (domyślnie dla `press-01`, zmiana przez `--machine`).
+- Adres API nie może zawierać danych logowania (`user:pass@`); taki adres jest odrzucany z kodem `2`.
+- Kod wyjścia: `0` gdy wszystkie zdarzenia przyjęto, `1` gdy wystąpił błąd HTTP, `2` przy złych argumentach, `3` gdy nie ma połączenia z API.
+
+### Scenariusze do wczesnego ostrzegania
+
+Scenariusze `normal`, `warn-spike` i `gradual-degradation` generują zdarzenia dla wszystkich czterech maszyn w pełnych oknach 60 s. Ten sam `--seed` i `--start` daje identyczną sekwencję, a sam `--seed` przy innym `--start` daje te same czasy względne (inne `eventId`).
+
+- `normal` - tylko normalna praca (`INFO` i pojedyncze `WARN`).
+- `warn-spike` - normalna praca z jednym krótkim pikiem `WARN` w jednym oknie, bez `ERROR`.
+- `gradual-degradation` - co najmniej 5 pełnych okien normalnej pracy (`--baseline-windows`, domyślnie 6), potem liczba `WARN` z jednym kodem (`--warn-code`) rośnie w kolejnych oknach (`--degradation-windows`, od 4 do 20, domyślnie 5; minimum 4 gwarantuje otwarcie epizodu wczesnego ostrzegania przed `ERROR`), a na końcu pojawia się jedno `ERROR`.
+
+`--ground-truth` zapisuje osobny plik JSON z seedem, scenariuszem i parametrami, maszyną, kodem `WARN`, początkiem degradacji oraz czasem i `eventId` pierwszego `ERROR`. Ground truth nigdy nie trafia do payloadów API.
+
+```powershell
+python tools/event-generator/generate_events.py --scenario gradual-degradation --seed 7 --output events.json --ground-truth ground-truth.json
+python tools/event-generator/generate_events.py --send --scenario gradual-degradation --seed 7 --start 2026-11-17T08:00:00Z --ground-truth ground-truth.json
+```
+
+Ponowne wysłanie tego samego scenariusza z tym samym `--seed` i `--start` daje te same `eventId`, więc API odpowie `409`; do kolejnego przebiegu użyj innego `--start`.
+
+### Generator w Docker Compose
+
+Usługa `event-generator` jest w profilu `generator`, nie publikuje portów i wysyła zdarzenia do `http://api:8080` w sieci Compose po osiągnięciu stanu `healthy` przez API. Bez argumentów wysyła losowe zdarzenia co 5 sekund do przerwania.
+
+```powershell
+docker compose --profile generator run --rm event-generator --send --scenario critical-once
+docker compose --profile generator run --rm event-generator --send --count 10 --interval 1
+docker compose --profile generator run --rm event-generator --send --scenario gradual-degradation --seed 7 --start 2026-11-17T08:00:00Z
+```
 
 ## Stub odbiornika webhooków
 
@@ -148,7 +192,7 @@ Workflow nie publikuje obrazów ani nie wdraża aplikacji. Ma tylko uprawnienie 
 - `frontend/` - aplikacja webowa, dodawana w kartach frontendowych;
 - `docs/` - dokumentacja projektu i wspólny kontrakt API OpenAPI (`openapi.yaml`);
 - `fixtures/` - przykładowe payloady zdarzeń;
-- `tools/event-generator/` - generator offline;
+- `tools/event-generator/` - generator zdarzeń (offline, wysyłka HTTP i scenariusze);
 - `tools/webhook-stub/` - lokalny odbiornik webhooków alertów;
 - `tests/` - testy automatyczne.
 
