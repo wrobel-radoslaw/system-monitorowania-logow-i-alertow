@@ -144,6 +144,15 @@ class WebhookStubHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    def _drain_exact(self, count):
+        remaining = count
+        while remaining > 0:
+            chunk = self.rfile.read(min(8192, remaining))
+            if not chunk:
+                return False
+            remaining -= len(chunk)
+        return True
+
     def read_body(self):
         if "chunked" in self.headers.get("Transfer-Encoding", "").lower():
             return self.read_chunked_body()
@@ -154,12 +163,17 @@ class WebhookStubHandler(BaseHTTPRequestHandler):
         if length < 0:
             return None, "nieprawidłowy nagłówek Content-Length"
         if length > MAX_BODY_BYTES:
+            self.close_connection = True
+            if length <= MAX_BODY_BYTES * 4:
+                self._drain_exact(length)
             return None, "payload przekracza %d bajtów" % MAX_BODY_BYTES
         return self.rfile.read(length), None
 
     # HttpClient w .NET (PostAsJsonAsync) wysyła body bez Content-Length, w kawałkach.
     def read_chunked_body(self):
         body = bytearray()
+        total_bytes = 0
+        exceeded = False
         while True:
             size_line = self.rfile.readline(1024)
             try:
@@ -170,11 +184,22 @@ class WebhookStubHandler(BaseHTTPRequestHandler):
             if size == 0:
                 while self.rfile.readline(1024) not in (b"\r\n", b"\n", b""):
                     pass
+                if exceeded:
+                    self.close_connection = True
+                    return None, "payload przekracza %d bajtów" % MAX_BODY_BYTES
                 return bytes(body), None
-            if len(body) + size > MAX_BODY_BYTES:
-                self.close_connection = True
-                return None, "payload przekracza %d bajtów" % MAX_BODY_BYTES
-            body += self.rfile.read(size)
+            total_bytes += size
+            if total_bytes > MAX_BODY_BYTES:
+                exceeded = True
+                if total_bytes > MAX_BODY_BYTES * 4 or not self._drain_exact(size):
+                    self.close_connection = True
+                    return None, "payload przekracza %d bajtów" % MAX_BODY_BYTES
+            else:
+                chunk = self.rfile.read(size)
+                if len(chunk) < size:
+                    self.close_connection = True
+                    return None, "nieprawidłowe kodowanie chunked"
+                body += chunk
             self.rfile.readline(1024)
 
     def do_GET(self):

@@ -142,10 +142,13 @@ class ServerTests(unittest.TestCase):
     def chunked_post(self, chunks):
         connection = http.client.HTTPConnection("127.0.0.1", self.server.server_address[1], timeout=5)
         try:
-            connection.request(
-                "POST", "/webhook", body=iter(chunks),
-                headers={"Content-Type": "application/json"}, encode_chunked=True,
-            )
+            try:
+                connection.request(
+                    "POST", "/webhook", body=iter(chunks),
+                    headers={"Content-Type": "application/json"}, encode_chunked=True,
+                )
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+                pass
             response = connection.getresponse()
             return response.status, json.loads(response.read().decode("utf-8"))
         finally:
@@ -159,6 +162,11 @@ class ServerTests(unittest.TestCase):
 
     def test_oversized_chunked_body_returns_413(self):
         status, body = self.chunked_post([b"x" * 40000, b"x" * 40000])
+        self.assertEqual(status, 413)
+        self.assertFalse(body["accepted"])
+
+    def test_very_large_oversized_chunked_body_returns_413(self):
+        status, body = self.chunked_post([b"x" * 150000, b"x" * 150000])
         self.assertEqual(status, 413)
         self.assertFalse(body["accepted"])
 
