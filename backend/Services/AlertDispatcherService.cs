@@ -131,7 +131,7 @@ private async Task SendAlert(
             EventId = alert.EventId,
             MachineId = alert.MachineId,
             RuleName = alert.RuleName,
-            Severity = Enum.Parse<Severity>(alert.Severity),
+            Severity = alert.Severity,
             TriggeredAt = new DateTimeOffset(
                 DateTime.SpecifyKind(
                     alert.TriggeredAt,
