@@ -644,7 +644,7 @@ static AlertDto ToAlertDTO(Alert a)
         EventId = a.EventId,
         MachineId = a.MachineId,
         RuleName = a.RuleName,
-        Severity = Enum.Parse<Severity>(a.Severity),
+        Severity = a.Severity,
         TriggeredAt = new DateTimeOffset(
             DateTime.SpecifyKind(
                 a.TriggeredAt,

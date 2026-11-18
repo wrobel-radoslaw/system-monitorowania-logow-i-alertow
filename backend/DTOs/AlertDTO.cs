@@ -12,7 +12,7 @@ public class AlertDto
 
     public string RuleName { get; set; } = null!;
 
-    public Severity Severity { get; set; }
+    public string Severity { get; set; } = null!;
 
     public DateTimeOffset TriggeredAt { get; set; }
 
