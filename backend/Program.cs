@@ -680,3 +680,5 @@ static bool IsDatabaseUnavailable(Exception exception)
 }
 
 app.Run();
+
+public partial class Program { }

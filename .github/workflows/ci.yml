@@ -115,3 +115,6 @@ jobs:
             echo "No .NET project found in backend/." >&2
             exit 1
           fi
+
+      - name: Run API integration tests
+        run: dotnet test tests/api-integration/ApiIntegrationTests.csproj -c Release --verbosity normal

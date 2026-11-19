@@ -179,8 +179,11 @@ Jeżeli `WEBHOOK_STUB_PORT` ma inną wartość, użyj jej zamiast `8090`.
 
 ```powershell
 python -m unittest discover -s tests -v
+dotnet test tests/api-integration/ApiIntegrationTests.csproj
 docker compose config --quiet
 ```
+
+Testy integracyjne API (`tests/api-integration/`) uruchamiają się jednym poleceniem na izolowanym kontenerze PostgreSQL (Testcontainers, wymagany działający Docker) oraz lokalnym odbiorniku webhooków w pamięci, bez zależności od usług zewnętrznych ani wspólnych danych developerskich.
 
 GitHub Actions uruchamia się dla Pull Requestów oraz pushy do `main`. Sprawdza testy generatora i konfigurację Compose. Buduje frontend, gdy istnieją `frontend/package.json` i `frontend/package-lock.json`, oraz backend, gdy znajdzie projekt lub rozwiązanie .NET. Jeśli kodu nie ma, podsumowanie jasno oznacza build jako `SKIPPED`; nie jest to dowód udanego builda.
 
